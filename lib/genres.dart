@@ -69,7 +69,7 @@ class BarChartSample1State extends State<BarChartSample1> {
     else if(len == 2){
       str = artists[0] + "\n" + artists[1];
     }
-    else if(len == 3){
+    else if(len > 3){
       str = artists[0] + "\n" + artists[1]+ "\n" + artists[2];
     }
     else {
@@ -96,6 +96,28 @@ class BarChartSample1State extends State<BarChartSample1> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
+                const SizedBox(
+                  height: 38,
+                ),
+                const Text(
+                  'Top Genres',
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(
+                  height: 4,
+                ),
+                Text(
+                  'Past 6 Months',
+                  style: TextStyle(
+                    color: Colors.green.shade700,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(
                   height: 38,
                 ),
@@ -144,7 +166,7 @@ class BarChartSample1State extends State<BarChartSample1> {
       double y, {
         bool isTouched = false,
         Color? barColor,
-        double width = 22,
+        double width = 20,
         List<int> showTooltips = const [],
       }) {
     barColor ??= widget.barColor;
@@ -152,7 +174,7 @@ class BarChartSample1State extends State<BarChartSample1> {
       x: x,
       barRods: [
         BarChartRodData(
-          toY: isTouched ? y + 1 : y,
+          toY: isTouched ? y + 5 : y,
           color: isTouched ? widget.touchedBarColor : barColor,
           width: width,
           borderSide: isTouched
@@ -172,19 +194,19 @@ class BarChartSample1State extends State<BarChartSample1> {
   List<BarChartGroupData> showingGroups() => List.generate(5, (i) {
     switch (i) {
       case 0:
-        var l1 = (genreMap[genreKeys[0]]!.length).toDouble();
+        var l1 = (genreMap[genreKeys[0]]!.length).toDouble()*.5;
         return makeGroupData(0, l1, isTouched: i == touchedIndex);
       case 1:
-        var l2 = (genreMap[genreKeys[1]]!.length).toDouble();
+        var l2 = (genreMap[genreKeys[1]]!.length).toDouble()*.5;
         return makeGroupData(1, l2, isTouched: i == touchedIndex);
       case 2:
-        var l3 = (genreMap[genreKeys[2]]!.length).toDouble();
+        var l3 = (genreMap[genreKeys[2]]!.length).toDouble()*.5;
         return makeGroupData(2, l3, isTouched: i == touchedIndex);
       case 3:
-        var l4 = (genreMap[genreKeys[3]]!.length).toDouble();
+        var l4 = (genreMap[genreKeys[3]]!.length).toDouble()*.5;
         return makeGroupData(3, l4, isTouched: i == touchedIndex);
       case 4:
-        var l5 = (genreMap[genreKeys[4]]!.length).toDouble();
+        var l5 = (genreMap[genreKeys[4]]!.length).toDouble()*.5;
         return makeGroupData(4, l5, isTouched: i == touchedIndex);
       default:
         return throw Error();
@@ -196,8 +218,8 @@ class BarChartSample1State extends State<BarChartSample1> {
       barTouchData: BarTouchData(
         touchTooltipData: BarTouchTooltipData(
           getTooltipColor: (_) => Colors.blueGrey,
-          tooltipHorizontalAlignment: FLHorizontalAlignment.right,
-          tooltipMargin: -10,
+          tooltipHorizontalAlignment: FLHorizontalAlignment.center,
+          tooltipMargin: 16,
           getTooltipItem: (group, groupIndex, rod, rodIndex) {
             String genre;
             switch (group.x) {
@@ -227,10 +249,10 @@ class BarChartSample1State extends State<BarChartSample1> {
               ),
               children: <TextSpan>[
                 TextSpan(
-                  text: (rod.toY - 1).toString(),
+                  text: (rod.toY - 1).toStringAsFixed(0),
                   style: const TextStyle(
                     color: Colors.white, //widget.touchedBarColor,
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -250,6 +272,9 @@ class BarChartSample1State extends State<BarChartSample1> {
           });
         },
       ),
+      groupsSpace: 50,
+      alignment: BarChartAlignment.center,
+      maxY: 25,
       titlesData: FlTitlesData(
         show: true,
         rightTitles: const AxisTitles(
@@ -262,7 +287,7 @@ class BarChartSample1State extends State<BarChartSample1> {
           sideTitles: SideTitles(
             showTitles: true,
             getTitlesWidget: getTitles,
-            reservedSize: 38,
+            reservedSize: 150,
           ),
         ),
         leftTitles: const AxisTitles(
@@ -288,22 +313,22 @@ class BarChartSample1State extends State<BarChartSample1> {
     Widget text;
     switch (value.toInt()) {
       case 0:
-        text = Text(genreKeys[0], style: style);
+        text = Text(genreKeys[0].replaceAll(' ', '\n'), style: style);
         break;
       case 1:
-        text = Text(genreKeys[1], style: style);
+        text = Text(genreKeys[1].replaceAll(' ', '\n'), style: style);
         break;
       case 2:
-        text = Text(genreKeys[2], style: style);
+        text = Text(genreKeys[2].replaceAll(' ', '\n'), style: style);
         break;
       case 3:
-        text =  Text(genreKeys[3], style: style);
+        text =  Text(genreKeys[3].replaceAll(' ', '\n'), style: style);
         break;
       case 4:
-        text =  Text(genreKeys[4], style: style);
+        text =  Text(genreKeys[4].replaceAll(' ', '\n'), style: style);
         break;
       default:
-        text = Text(genreKeys[0], style: style);
+        text = Text(genreKeys[0].replaceAll(' ', '\n'), style: style);
         break;
     }
     return SideTitleWidget(
@@ -315,6 +340,9 @@ class BarChartSample1State extends State<BarChartSample1> {
 
   BarChartData randomData() {
     return BarChartData(
+      groupsSpace: 50,
+      alignment: BarChartAlignment.center,
+      maxY: 25,
       barTouchData: const BarTouchData(
         enabled: false,
       ),
@@ -324,7 +352,7 @@ class BarChartSample1State extends State<BarChartSample1> {
           sideTitles: SideTitles(
             showTitles: true,
             getTitlesWidget: getTitles,
-            reservedSize: 38,
+            reservedSize: 150,
           ),
         ),
         leftTitles: const AxisTitles(
@@ -349,37 +377,42 @@ class BarChartSample1State extends State<BarChartSample1> {
       barGroups: List.generate(5, (i) {
         switch (i) {
           case 0:
+            var rand = (genreMap[genreKeys[Random().nextInt(4)]]!.length).toDouble()*.5;
             return makeGroupData(
               0,
-              Random().nextInt(15).toDouble() + 6,
+              Random().nextInt(10).toDouble()+4,
               barColor: widget.availableColors[
               Random().nextInt(widget.availableColors.length)],
             );
           case 1:
+            var rand = (genreMap[genreKeys[Random().nextInt(4)]]!.length).toDouble()*.5;
             return makeGroupData(
               1,
-              Random().nextInt(15).toDouble() + 6,
+              Random().nextInt(10).toDouble()+4,
               barColor: widget.availableColors[
               Random().nextInt(widget.availableColors.length)],
             );
           case 2:
+            var rand = (genreMap[genreKeys[Random().nextInt(4)]]!.length).toDouble()*.5;
             return makeGroupData(
               2,
-              Random().nextInt(15).toDouble() + 6,
+              Random().nextInt(10).toDouble()+4,
               barColor: widget.availableColors[
               Random().nextInt(widget.availableColors.length)],
             );
           case 3:
+            var rand = (genreMap[genreKeys[Random().nextInt(4)]]!.length).toDouble()*.5;
             return makeGroupData(
               3,
-              Random().nextInt(15).toDouble() + 6,
+              Random().nextInt(10).toDouble()+4,
               barColor: widget.availableColors[
               Random().nextInt(widget.availableColors.length)],
             );
           case 4:
+            var rand = (genreMap[genreKeys[Random().nextInt(4)]]!.length).toDouble()*.5;
             return makeGroupData(
               4,
-              Random().nextInt(15).toDouble() + 6,
+              Random().nextInt(4).toDouble()+4,
               barColor: widget.availableColors[
               Random().nextInt(widget.availableColors.length)],
             );

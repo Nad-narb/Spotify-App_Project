@@ -60,7 +60,7 @@ class SpotifyService {
 
 Future<List<dynamic>> getTopTracksShort() async {
   var featuredData = await http.get(
-    Uri.parse('https://api.spotify.com/v1/me/top/tracks?time_range=short_term'),
+    Uri.parse('https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50'),
     headers: {
       "content-type": 'application/json',
       "authorization": 'Bearer $ACCESS_TOKEN',
@@ -77,7 +77,7 @@ Future<List<dynamic>> getTopTracksShort() async {
 
 Future<List<dynamic>> getTopTracksMedium() async {
   var featuredData = await http.get(
-    Uri.parse('https://api.spotify.com/v1/me/top/tracks?time_range=medium_term'),
+    Uri.parse('https://api.spotify.com/v1/me/top/tracks?time_range=medium_term&limit=50'),
     headers: {
       "content-type": 'application/json',
       "authorization": 'Bearer $ACCESS_TOKEN',
@@ -94,7 +94,7 @@ Future<List<dynamic>> getTopTracksMedium() async {
 
 Future<List<dynamic>> getTopTracksLong() async {
   var featuredData = await http.get(
-    Uri.parse('https://api.spotify.com/v1/me/top/tracks?time_range=long_term'),
+    Uri.parse('https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=50'),
     headers: {
       "content-type": 'application/json',
       "authorization": 'Bearer $ACCESS_TOKEN',
@@ -111,7 +111,7 @@ Future<List<dynamic>> getTopTracksLong() async {
 
 Future<List<dynamic>> getTopArtistsShort() async {
   var featuredData = await http.get(
-    Uri.parse('https://api.spotify.com/v1/me/top/artists?time_range=short_term'),
+    Uri.parse('https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50'),
     headers: {
       "content-type": 'application/json',
       "authorization": 'Bearer $ACCESS_TOKEN',
@@ -128,7 +128,7 @@ Future<List<dynamic>> getTopArtistsShort() async {
 
 Future<List<dynamic>> getTopArtistsMedium() async {
   var featuredData = await http.get(
-    Uri.parse('https://api.spotify.com/v1/me/top/artists?time_range=medium_term'),
+    Uri.parse('https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=50'),
     headers: {
       "content-type": 'application/json',
       "authorization": 'Bearer $ACCESS_TOKEN',
@@ -145,7 +145,7 @@ Future<List<dynamic>> getTopArtistsMedium() async {
 
 Future<List<dynamic>> getTopArtistsLong() async {
   var featuredData = await http.get(
-    Uri.parse('https://api.spotify.com/v1/me/top/artists?time_range=long_term'),
+    Uri.parse('https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50'),
     headers: {
       "content-type": 'application/json',
       "authorization": 'Bearer $ACCESS_TOKEN',
