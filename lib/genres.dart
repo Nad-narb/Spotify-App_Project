@@ -377,7 +377,6 @@ class BarChartSample1State extends State<BarChartSample1> {
       barGroups: List.generate(5, (i) {
         switch (i) {
           case 0:
-            var rand = (genreMap[genreKeys[Random().nextInt(4)]]!.length).toDouble()*.5;
             return makeGroupData(
               0,
               Random().nextInt(10).toDouble()+4,
@@ -385,7 +384,6 @@ class BarChartSample1State extends State<BarChartSample1> {
               Random().nextInt(widget.availableColors.length)],
             );
           case 1:
-            var rand = (genreMap[genreKeys[Random().nextInt(4)]]!.length).toDouble()*.5;
             return makeGroupData(
               1,
               Random().nextInt(10).toDouble()+4,
@@ -393,7 +391,6 @@ class BarChartSample1State extends State<BarChartSample1> {
               Random().nextInt(widget.availableColors.length)],
             );
           case 2:
-            var rand = (genreMap[genreKeys[Random().nextInt(4)]]!.length).toDouble()*.5;
             return makeGroupData(
               2,
               Random().nextInt(10).toDouble()+4,
@@ -401,7 +398,6 @@ class BarChartSample1State extends State<BarChartSample1> {
               Random().nextInt(widget.availableColors.length)],
             );
           case 3:
-            var rand = (genreMap[genreKeys[Random().nextInt(4)]]!.length).toDouble()*.5;
             return makeGroupData(
               3,
               Random().nextInt(10).toDouble()+4,
@@ -409,7 +405,6 @@ class BarChartSample1State extends State<BarChartSample1> {
               Random().nextInt(widget.availableColors.length)],
             );
           case 4:
-            var rand = (genreMap[genreKeys[Random().nextInt(4)]]!.length).toDouble()*.5;
             return makeGroupData(
               4,
               Random().nextInt(4).toDouble()+4,
