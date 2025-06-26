@@ -87,15 +87,65 @@ class BarChartSample1State extends State<BarChartSample1> {
     if(genreKeys.isEmpty){
       return const Center(child: Text("No genre data available"));
     }
-    return AspectRatio(
-      aspectRatio: 1,
-      child: Stack(
+    return Scaffold(backgroundColor: Colors.grey,
+      appBar: AppBar(
+        title: Text(widget.title),
+          automaticallyImplyLeading: false,
+          leading: Builder(
+            builder: (context) {
+              return IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+            },
+          );
+        },
+      ),
+    ),
+    drawer: Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          const DrawerHeader(
+            decoration: BoxDecoration(color: Colors.blue),
+            child: Text('Drawer Header'),
+          ),
+          ListTile(
+            title: const Text('Top Tracks'),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: const Text('Top Artists'),
+            onTap: () {
+              Navigator.push(
+              context,
+                MaterialPageRoute(builder: (context) => ArtistsPage(title: "Artists")),
+              );
+            },
+          ),
+          ListTile(
+            title: const Text('Top Genres'),
+            onTap: () {
+            },
+          ),
+        ],
+      ),
+    ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+            children: [
+        Expanded(
+        child: Stack(
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
+                /*
                 const SizedBox(
                   height: 38,
                 ),
@@ -121,6 +171,7 @@ class BarChartSample1State extends State<BarChartSample1> {
                 const SizedBox(
                   height: 38,
                 ),
+                */
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -157,6 +208,10 @@ class BarChartSample1State extends State<BarChartSample1> {
             ),
           )
         ],
+      ),
+      ),
+    ],
+    ),
       ),
     );
   }
