@@ -34,7 +34,6 @@ class _ArtistsPageState extends State<ArtistsPage> {
       _error = null;
     });
     try {
-      // Then get top artists
       final artistsShort = await getTopArtistsShort();
       final artistsMedium = await getTopArtistsMedium();
       final artistsLong = await getTopArtistsLong();
@@ -170,23 +169,93 @@ class _ArtistsPageState extends State<ArtistsPage> {
               ],
             ),
           ),
-          // Track list
+          // Artist list
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _error != null
                 ? Center(child: Text(_error!))
                 : _currentArtists.isEmpty
-                ? const Center(child: Text('No Artists found'))
+                ? const Center(child: Text('No artists found'))
                 : ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               itemCount: _currentArtists.length,
               itemBuilder: (context, index) {
                 final artist = _currentArtists[index] as Map<String, dynamic>;
-                return ListTile(
-                  leading: (artist['images'] as List?)?.isNotEmpty ?? false
-                      ? Image.network((artist['images'][0] as Map)['url'])
-                      : const Icon(Icons.person),
-                  title: Text((artist['name'] as String?) ?? 'Unknown Artist'),
+                final rank = index + 1;
+                final genres = (artist['genres'] as List<dynamic>?)?.join(', ') ?? 'No genres listed';
+
+                return Card(
+                  elevation: 2,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        // Rank number
+                        Container(
+                          width: 30,
+                          alignment: Alignment.center,
+                          child: Text(
+                            '#$rank',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ),
+                        // Artist image
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: (artist['images'] as List?)?.isNotEmpty ?? false
+                              ? Image.network(
+                            (artist['images'][0] as Map)['url'],
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          )
+                              : Container(
+                            width: 100,
+                            height: 100,
+                            color: Colors.grey[300],
+                            child: Icon(Icons.person, size: 40, color: Colors.grey[600]),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Artist info
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                (artist['name'] as String?) ?? 'Unknown Artist',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                genres,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 );
               },
             ),

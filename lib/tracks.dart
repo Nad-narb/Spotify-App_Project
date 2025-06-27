@@ -216,19 +216,19 @@ class _TracksPageState extends State<TracksPage> {
                               ? (track['album']['images'] as List).isNotEmpty
                               ? Image.network(
                             (track['album']['images'][0] as Map)['url'],
-                            width: 60,
-                            height: 60,
+                            width: 100,
+                            height: 100,
                             fit: BoxFit.cover,
                           )
                               : Container(
-                            width: 60,
-                            height: 60,
+                            width: 100,
+                            height: 100,
                             color: Colors.grey[300],
                             child: Icon(Icons.music_note, size: 30, color: Colors.grey[600]),
                           )
                               : Container(
-                            width: 60,
-                            height: 60,
+                            width: 100,
+                            height: 100,
                             color: Colors.grey[300],
                             child: Icon(Icons.music_note, size: 30, color: Colors.grey[600]),
                           ),
