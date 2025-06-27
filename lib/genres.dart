@@ -6,6 +6,7 @@ import 'package:http/http.dart';
 import 'artists.dart';
 import 'tracks.dart';
 import 'spotifyInteraction.dart';
+import 'recentlyPlayed.dart';
 
 class BarChartSample1 extends StatefulWidget {
   BarChartSample1({Key? key, required this.title}) : super(key: key);
@@ -128,6 +129,15 @@ class BarChartSample1State extends State<BarChartSample1> {
           ListTile(
             title: const Text('Top Genres'),
             onTap: () {
+            },
+          ),
+          ListTile(
+            title: const Text('Recently Played'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => RecentlyPlayedPage(title: "Recently Played")),
+              );
             },
           ),
         ],

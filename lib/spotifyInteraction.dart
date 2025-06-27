@@ -40,6 +40,7 @@ class SpotifyService {
           'user-read-currently-playing',
           'user-read-email',
           'user-top-read',
+          'user-read-recently-played',
         ],
       );
 
@@ -159,6 +160,24 @@ Future<List<dynamic>> getTopArtistsLong() async {
     throw Exception('Failed to get artists: ${featuredData.statusCode}');
   }
 }
+
+Future<List<dynamic>> getRecentlyPlayed() async {
+  var featuredData = await http.get(
+    Uri.parse('https://api.spotify.com/v1/me/player/recently-played?limit=50'),
+    headers: {
+      "content-type": 'application/json',
+      "authorization": 'Bearer $ACCESS_TOKEN',
+    },
+  );
+  if (featuredData.statusCode == 200) {
+    final featuredPlaylist = convert.jsonDecode(featuredData.body);
+    return featuredPlaylist['items'] as List<dynamic>;
+  }
+  else {
+    throw Exception('Failed to get artists: ${featuredData.statusCode}');
+  }
+}
+
 
 Future<Map<String, List<String>>> getTopGenres() async {
   final topArtists = await getTopArtistsMedium();

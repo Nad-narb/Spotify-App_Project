@@ -4,6 +4,7 @@ import './spotifyInteraction.dart';
 import 'package:animated_button_bar/animated_button_bar.dart';
 import 'artists.dart';
 import 'genres.dart';
+import 'recentlyPlayed.dart';
 
 class TracksPage extends StatefulWidget {
   TracksPage({Key? key, required this.title}) : super(key: key);
@@ -123,6 +124,17 @@ class _TracksPageState extends State<TracksPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => BarChartSample1(title: "Genres")),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('Recently Played'),
+              selected: _selectedIndex == 3,
+              onTap: () {
+                _onItemTapped(3);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RecentlyPlayedPage(title: "Recently Played")),
                 );
               },
             ),
