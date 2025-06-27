@@ -35,7 +35,6 @@ class _TracksPageState extends State<TracksPage> {
       _error = null;
     });
     try {
-      // Then get top tracks
       final tracksShort = await getTopTracksShort();
       final tracksMedium = await getTopTracksMedium();
       final tracksLong = await getTopTracksLong();
@@ -180,18 +179,97 @@ class _TracksPageState extends State<TracksPage> {
                 : _currentTracks.isEmpty
                 ? const Center(child: Text('No tracks found'))
                 : ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               itemCount: _currentTracks.length,
               itemBuilder: (context, index) {
                 final track = _currentTracks[index] as Map<String, dynamic>;
-                return ListTile(
-                  leading: (track['album'] as Map<String, dynamic>?)?['images'] is List
-                      ? (track['album']['images'] as List).isNotEmpty
-                      ? Image.network((track['album']['images'][0] as Map)['url'])
-                      : const Icon(Icons.music_note)
-                      : const Icon(Icons.music_note),
-                  title: Text((track['name'] as String?) ?? 'Unknown track'),
-                  subtitle: Text(
-                    (track['artists'] as List?)?.map<String>((a) => (a as Map)['name'] as String? ?? '').join(', ') ?? 'Unknown artist',
+                final rank = index + 1;
+                final artists = (track['artists'] as List?)?.map<String>((a) => (a as Map)['name'] as String? ?? '').join(', ') ?? 'Unknown artist';
+
+                return Card(
+                  elevation: 2,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        // Rank number
+                        Container(
+                          width: 30,
+                          alignment: Alignment.center,
+                          child: Text(
+                            '#$rank',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ),
+                        // Track image
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: (track['album'] as Map<String, dynamic>?)?['images'] is List
+                              ? (track['album']['images'] as List).isNotEmpty
+                              ? Image.network(
+                            (track['album']['images'][0] as Map)['url'],
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          )
+                              : Container(
+                            width: 60,
+                            height: 60,
+                            color: Colors.grey[300],
+                            child: Icon(Icons.music_note, size: 30, color: Colors.grey[600]),
+                          )
+                              : Container(
+                            width: 60,
+                            height: 60,
+                            color: Colors.grey[300],
+                            child: Icon(Icons.music_note, size: 30, color: Colors.grey[600]),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Track info
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                (track['name'] as String?) ?? 'Unknown track',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                artists,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Play button
+                        IconButton(
+                          icon: const Icon(Icons.play_arrow),
+                          onPressed: () {
+                            // Add play functionality here
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
