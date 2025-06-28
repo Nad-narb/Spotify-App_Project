@@ -97,7 +97,7 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
               child: Text('Drawer Header'),
             ),
             ListTile(
-              title: const Text('Tracks'),
+              title: const Text('Tracks', style: TextStyle(color: Colors.black)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -106,7 +106,7 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
               },
             ),
             ListTile(
-              title: const Text('Artists'),
+              title: const Text('Artists', style: TextStyle(color: Colors.black)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -115,7 +115,7 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
               },
             ),
             ListTile(
-              title: const Text('Genres'),
+              title: const Text('Genres', style: TextStyle(color: Colors.black)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -124,7 +124,10 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
               },
             ),
             ListTile(
-              title: const Text('Recently Played'),
+              title: const Text('Recently Played', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+              onTap: () {
+                Navigator.pop(context);
+              },
             ),
           ],
         ),

@@ -20,13 +20,6 @@ class _ArtistsPageState extends State<ArtistsPage> {
   int _selectedTimeRange = 0;
   bool _isLoading = false;
   String? _error;
-  int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   Future<void> _loadTopArtists() async {
     setState(() {
@@ -96,10 +89,8 @@ class _ArtistsPageState extends State<ArtistsPage> {
               child: Text('Drawer Header'),
             ),
             ListTile(
-              title: const Text('Tracks'),
-              selected: _selectedIndex == 0,
+              title: const Text('Tracks', style: TextStyle(color: Colors.black)),
               onTap: () {
-                _onItemTapped(0);
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => TracksPage(title: "Tracks")),
@@ -107,18 +98,14 @@ class _ArtistsPageState extends State<ArtistsPage> {
               },
             ),
             ListTile(
-              title: const Text('Artists'),
-              selected: _selectedIndex == 1,
+              title: const Text('Artists', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
               onTap: () {
-                _onItemTapped(1);
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: const Text('Genres'),
-              selected: _selectedIndex == 2,
+              title: const Text('Genres', style: TextStyle(color: Colors.black)),
               onTap: () {
-                _onItemTapped(2);
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => BarChartSample1(title: "Genres")),
@@ -126,10 +113,8 @@ class _ArtistsPageState extends State<ArtistsPage> {
               },
             ),
             ListTile(
-              title: const Text('Recently Played'),
-              selected: _selectedIndex == 3,
+              title: const Text('Recently Played', style: TextStyle(color: Colors.black)),
               onTap: () {
-                _onItemTapped(3);
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => RecentlyPlayedPage(title: "Recently Played")),

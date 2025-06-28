@@ -112,13 +112,13 @@ class BarChartSample1State extends State<BarChartSample1> {
             child: Text('Drawer Header'),
           ),
           ListTile(
-            title: const Text('Top Tracks'),
+            title: const Text('Top Tracks', style: TextStyle(color: Colors.black)),
             onTap: () {
               Navigator.pop(context);
             },
           ),
           ListTile(
-            title: const Text('Top Artists'),
+            title: const Text('Top Artists', style: TextStyle(color: Colors.black)),
             onTap: () {
               Navigator.push(
               context,
@@ -127,12 +127,13 @@ class BarChartSample1State extends State<BarChartSample1> {
             },
           ),
           ListTile(
-            title: const Text('Top Genres'),
+            title: const Text('Top Genres', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
             onTap: () {
+              Navigator.pop(context);
             },
           ),
           ListTile(
-            title: const Text('Recently Played'),
+            title: const Text('Recently Played', style: TextStyle(color: Colors.black)),
             onTap: () {
               Navigator.push(
                 context,
