@@ -6,6 +6,7 @@ import 'artists.dart';
 import 'genres.dart';
 import 'recentlyPlayed.dart';
 
+
 class TracksPage extends StatefulWidget {
   TracksPage({Key? key, required this.title}) : super(key: key);
   final String title;
@@ -250,6 +251,8 @@ class _TracksPageState extends State<TracksPage> {
                         IconButton(
                           icon: const Icon(Icons.play_arrow),
                           onPressed: () {
+                            final trackUri = track["uri"] as String;
+                            playTrack(trackUri);
                             // Add play functionality here
                           },
                         ),
