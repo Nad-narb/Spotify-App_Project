@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:oauth2_client/access_token_response.dart';
 import 'package:oauth2_client/oauth2_client.dart';
@@ -212,6 +214,43 @@ Future<Map<String, List<String>>> getTopGenres() async {
   }
   debugPrint("Genre Count error");
   return sortedGenreArtists;
+}
+
+Future<String> getID() async {
+  var deviceData = await http.get(
+    Uri.parse('https://api.spotify.com/v1/me/player/devices'),
+    headers: {
+      "content-type": 'application/json',
+      "authorization": 'Bearer $ACCESS_TOKEN',
+    },
+  );
+  if (deviceData.statusCode == 200) {
+    final data = convert.jsonDecode(deviceData.body);
+    final devices = data['devices'] as List<dynamic>;
+    final android = devices[0]["id"];
+    return android.toString();
+  }
+  else {
+    throw Exception('Failed to get device: ${deviceData.statusCode}');
+  }
+}
+
+Future<void> playTrack(String trackUri) async {
+  final id = await getID();
+  final response = await http.put(
+    Uri.parse('https://api.spotify.com/v1/me/player/play?device_id=' + id),
+    headers: {
+      "Authorization": 'Bearer $ACCESS_TOKEN',
+      "Content-Type": 'application/json',
+    },
+    body: convert.jsonEncode({
+      "uris": [trackUri],
+    }),
+  );
+
+  if (response.statusCode != 204) {
+    throw Exception('Failed to play track: ${response.statusCode} - ${response.body}');
+  }
 }
 
 
