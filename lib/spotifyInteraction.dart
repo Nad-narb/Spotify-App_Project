@@ -385,12 +385,13 @@ Future<dynamic> getID() async {
     final devices = data['devices'] as List<dynamic>;
     final android = devices[0]["id"];
     if (devices.isEmpty) {
-      throw Exception('Please download and have spotify running in the background');
+      throw Exception('Please have spotify running in the background');
     }
     await _storage.write(key: 'device_id', value: android.toString());
     return android.toString();
   }
 }
+
 
 Future<void> playTrack(String trackUri) async {
   makeSpotifyApiCall;
@@ -412,7 +413,7 @@ Future<void> playTrack(String trackUri) async {
   );
 
   if (response.statusCode != 204) {
-    throw Exception('Failed to play track: ${response.statusCode} - ${response.body}');
+    throw Exception('Please have spotify running in the background');
   }
 }
 
@@ -432,7 +433,7 @@ Future<void> pauseTrack() async {
   );
 
   if (response.statusCode != 204 && response.statusCode != 200) {
-    throw Exception('Failed to pause: ${response.statusCode} - ${response.body}');
+    throw Exception('Please have spotify running in the background');
   }
 }
 
