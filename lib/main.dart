@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:oauth2_client/access_token_response.dart';
-import 'package:oauth2_client/oauth2_client.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'tracks.dart';
 import './spotifyInteraction.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -24,8 +24,45 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Spotilytics'),
+      home: const AuthWrapper(),
     );
+  }
+}
+
+class AuthWrapper extends StatefulWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  bool _isLoading = true;
+  bool _isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final loggedIn = await SpotifyService.isLoggedIn();
+    setState(() {
+      _isLoggedIn = loggedIn;
+      _isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    return _isLoggedIn ? TracksPage(title: "Tracks") : const MyHomePage(title: 'Spotilytics');
   }
 }
 
@@ -39,7 +76,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  AccessTokenResponse? _token;
   bool _isLoading = false;
   String? _error;
 
@@ -50,14 +86,17 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     try {
       final token = await SpotifyService.authenticate();
-      setState(() {
-        _token = token;
-        _isLoading = false;
-      });
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => TracksPage(title: "Tracks")),
-      );
+      if (token != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => TracksPage(title: "Tracks")),
+        );
+      } else {
+        setState(() {
+          _error = 'Authentication failed. Please try again.';
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       setState(() {
         _error = 'Failed to authenticate: ${e.toString()}';
@@ -71,6 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        automaticallyImplyLeading: false,
         centerTitle: true,
       ),
       body: Padding(
@@ -78,25 +118,9 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget> [
+            children: <Widget>[
               if (_isLoading)
                 const CircularProgressIndicator()
-              else if (_token != null)
-                Column(
-                  children: [
-                    const Icon(Icons.check_circle, color: Colors.green, size: 50),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Successfully authenticated!',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Access token: ${_token!.accessToken!.substring(0, 10)}...',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
-                )
               else
                 Column(
                   children: [
