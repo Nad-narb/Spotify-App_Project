@@ -149,9 +149,8 @@ Future<void> login() async {
 }
 
 Future<void> makeSpotifyApiCall() async {
-  final accessToken = await SpotifyService.getValidAccessToken();
-
-  if (accessToken == null) {
+  final ACCESS_TOKEN = await SpotifyService.getValidAccessToken();
+  if (ACCESS_TOKEN == null) {
     // Not logged in or token refresh failed
     await login(); // Show login screen
     return;
@@ -161,7 +160,7 @@ Future<void> makeSpotifyApiCall() async {
     // Make your API call with the accessToken
     final response = await http.get(
       Uri.parse('https://api.spotify.com/v1/me'),
-      headers: {'Authorization': 'Bearer $accessToken'},
+      headers: {'Authorization': 'Bearer $ACCESS_TOKEN'},
     );
 
     if (response.statusCode == 401) {
@@ -187,8 +186,7 @@ Future<void> logout() async {
 }
 
 Future<List<dynamic>> getTopTracksShort() async {
-  makeSpotifyApiCall;
-  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
+  final ACCESS_TOKEN = await SpotifyService.getValidAccessToken();
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50'),
     headers: {
@@ -206,8 +204,7 @@ Future<List<dynamic>> getTopTracksShort() async {
 }
 
 Future<List<dynamic>> getTopTracksMedium() async {
-  makeSpotifyApiCall;
-  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
+  final ACCESS_TOKEN = await SpotifyService.getValidAccessToken();
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/tracks?time_range=medium_term&limit=50'),
     headers: {
@@ -225,8 +222,7 @@ Future<List<dynamic>> getTopTracksMedium() async {
 }
 
 Future<List<dynamic>> getTopTracksLong() async {
-  makeSpotifyApiCall;
-  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
+  final ACCESS_TOKEN = await SpotifyService.getValidAccessToken();
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=50'),
     headers: {
@@ -244,8 +240,7 @@ Future<List<dynamic>> getTopTracksLong() async {
 }
 
 Future<List<dynamic>> getTopArtistsShort() async {
-  makeSpotifyApiCall;
-  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
+  final ACCESS_TOKEN = await SpotifyService.getValidAccessToken();
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50'),
     headers: {
@@ -263,8 +258,7 @@ Future<List<dynamic>> getTopArtistsShort() async {
 }
 
 Future<List<dynamic>> getTopArtistsMedium() async {
-  makeSpotifyApiCall;
-  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
+  final ACCESS_TOKEN = await SpotifyService.getValidAccessToken();
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=50'),
     headers: {
@@ -282,8 +276,7 @@ Future<List<dynamic>> getTopArtistsMedium() async {
 }
 
 Future<List<dynamic>> getTopArtistsLong() async {
-  makeSpotifyApiCall;
-  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
+  final ACCESS_TOKEN = await SpotifyService.getValidAccessToken();
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50'),
     headers: {
@@ -301,8 +294,7 @@ Future<List<dynamic>> getTopArtistsLong() async {
 }
 
 Future<List<dynamic>> getRecentlyPlayed() async {
-  makeSpotifyApiCall;
-  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
+  final ACCESS_TOKEN = await SpotifyService.getValidAccessToken();
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/player/recently-played?limit=50'),
     headers: {
@@ -334,8 +326,6 @@ Future<List<dynamic>> getRecentlyPlayed() async {
 }
 
 Future<Map<String, List<String>>> getTopGenres() async {
-  makeSpotifyApiCall;
-  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
   final topArtists = await getTopArtistsMedium();
   final Map<String, int> genreCount = {};
   final Map<String, List<String>> genreArtists = {};
@@ -370,72 +360,108 @@ Future<Map<String, List<String>>> getTopGenres() async {
   return sortedGenreArtists;
 }
 
-Future<dynamic> getID() async {
-  makeSpotifyApiCall;
-  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
-  var deviceData = await http.get(
-    Uri.parse('https://api.spotify.com/v1/me/player/devices'),
+Future<String> getDeviceId() async {
+  // Get valid access token
+  final accessToken = await SpotifyService.getValidAccessToken();
+  if (accessToken == null) {
+    throw Exception('Not authenticated - please login again');
+  }
+
+  // Try to get device list
+  final response = await http.get(
+    Uri.parse('https://api.spotify.com/v1/me/player/devices'), // Fixed typo in endpoint
     headers: {
-      "content-type": 'application/json',
-      "authorization": 'Bearer $ACCESS_TOKEN',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
     },
   );
-  if (deviceData.statusCode == 200) {
-    final data = convert.jsonDecode(deviceData.body);
-    final devices = data['devices'] as List<dynamic>;
-    final android = devices[0]["id"];
+
+  if (response.statusCode == 200) {
+    final data = convert.jsonDecode(response.body);
+    final devices = data['devices'] as List<dynamic>; // Fixed typo in property name
+
     if (devices.isEmpty) {
-      throw Exception('Please have spotify running in the background');
+      throw Exception('No active devices found. Please open Spotify on your device.');
     }
-    await _storage.write(key: 'device_id', value: android.toString());
-    return android.toString();
+
+    // Get first active device or first available device
+    final device = devices.firstWhere(
+          (d) => d['is_active'] == true,
+      orElse: () => devices.first,
+    );
+
+    final deviceId = device['id']?.toString();
+    if (deviceId == null || deviceId.isEmpty) {
+      throw Exception('Invalid device ID received');
+    }
+
+    // Store device ID for future use
+    await _storage.write(key: 'device_id', value: deviceId);
+    return deviceId;
+  } else {
+    throw Exception('Failed to get devices: ${response.statusCode}');
   }
 }
 
-
 Future<void> playTrack(String trackUri) async {
-  makeSpotifyApiCall;
-  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
-  String device_id = _storage.read(key: 'device_id').toString();
-  if(device_id.isEmpty){
-    device_id = await getID();
-  }
-  final response = await http.put(
-    Uri.parse('https://api.spotify.com/v1/me/player/play?device_id=' + device_id),
-    headers: {
-      "Authorization": 'Bearer $ACCESS_TOKEN',
-      "Content-Type": 'application/json',
-    },
-    body: convert.jsonEncode({
-      "uris": [trackUri],
-      "position_ms": 5000
-    }),
-  );
+  try {
+    final accessToken = await SpotifyService.getValidAccessToken();
+    if (accessToken == null) {
+      throw Exception('Not authenticated');
+    }
 
-  if (response.statusCode != 204) {
-    throw Exception('Please have spotify running in the background');
+    final deviceId = await getDeviceId();
+
+    final response = await http.put(
+      Uri.parse('https://api.spotify.com/v1/me/player/play?device_id=$deviceId'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: convert.jsonEncode({
+        'uris': [trackUri],
+        'position_ms': 5000
+      }),
+    );
+
+    if (response.statusCode != 204) {
+      throw Exception('Failed to play track: Please have spotify opened');
+    }
+  } catch (e) {
+    // Clear device ID cache if there's an error
+    await _storage.delete(key: 'device_id');
+    rethrow;
   }
 }
 
 Future<void> pauseTrack() async {
-  makeSpotifyApiCall;
-  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
-  String device_id = _storage.read(key: 'device_id').toString();
-  if (device_id.isEmpty) {
-    device_id = await getID();
-  }
-  final response = await http.put(
-    Uri.parse('https://api.spotify.com/v1/me/player/pause?device_id=$device_id'),
-    headers: {
-      "Authorization": 'Bearer $ACCESS_TOKEN',
-      "Content-Type": 'application/json',
-    },
-  );
+  try {
+    final accessToken = await SpotifyService.getValidAccessToken();
+    if (accessToken == null) {
+      throw Exception('Not authenticated');
+    }
 
-  if (response.statusCode != 204 && response.statusCode != 200) {
-    throw Exception('Please have spotify running in the background');
+    // Try to get stored device ID first
+    String? deviceId = await _storage.read(key: 'device_id');
+    if (deviceId == null || deviceId.isEmpty) {
+      deviceId = await getDeviceId();
+    }
+
+    final response = await http.put(
+      Uri.parse('https://api.spotify.com/v1/me/player/pause?device_id=$deviceId'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 204 && response.statusCode != 200) {
+      throw Exception('Failed to pause playback: Please have spotify opened');
+    }
+  } catch (e) {
+    await _storage.delete(key: 'device_id');
+    rethrow;
   }
 }
-
 
 
