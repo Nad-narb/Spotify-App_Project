@@ -80,6 +80,11 @@ class _ArtistsPageState extends State<ArtistsPage> {
             );
           },
         ),
+        actions: [IconButton(
+          icon:Icon(Icons.refresh),
+          onPressed: _loadTopArtists,
+        ),
+        ],
       ),
       drawer: Drawer(
         child: ListView(

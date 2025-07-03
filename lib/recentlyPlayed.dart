@@ -122,6 +122,11 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
             );
           },
         ),
+        actions: [IconButton(
+          icon:Icon(Icons.refresh),
+          onPressed: _loadRecentlyPlayed,
+        ),
+        ],
       ),
       drawer: Drawer(
         child: ListView(

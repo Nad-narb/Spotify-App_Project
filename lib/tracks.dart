@@ -115,6 +115,11 @@ class _TracksPageState extends State<TracksPage> {
             );
           },
         ),
+        actions: [IconButton(
+          icon:Icon(Icons.refresh),
+          onPressed: _loadTopTracks,
+          ),
+        ],
       ),
       drawer: Drawer(
         child: ListView(
