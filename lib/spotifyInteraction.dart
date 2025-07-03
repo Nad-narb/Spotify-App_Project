@@ -174,7 +174,21 @@ Future<List<dynamic>> getRecentlyPlayed() async {
   );
   if (featuredData.statusCode == 200) {
     final featuredPlaylist = convert.jsonDecode(featuredData.body);
-    return featuredPlaylist['items'] as List<dynamic>;
+    final items = featuredPlaylist['items'] as List<dynamic>;
+
+    // Filter out consecutive duplicates
+    final uniqueItems = <dynamic>[];
+    String? lastTrackId;
+
+    for (final item in items) {
+      final currentTrackId = item['track']['id'] as String?;
+      if (currentTrackId != lastTrackId) {
+        uniqueItems.add(item);
+        lastTrackId = currentTrackId;
+      }
+    }
+
+    return uniqueItems;
   }
   else {
     throw Exception('Failed to get artists: ${featuredData.statusCode}');
@@ -217,7 +231,7 @@ Future<Map<String, List<String>>> getTopGenres() async {
   return sortedGenreArtists;
 }
 
-Future<String> getID() async {
+Future<dynamic> getID() async {
   var deviceData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/player/devices'),
     headers: {
@@ -229,11 +243,11 @@ Future<String> getID() async {
     final data = convert.jsonDecode(deviceData.body);
     final devices = data['devices'] as List<dynamic>;
     final android = devices[0]["id"];
+    if (devices.isEmpty) {
+      throw Exception('Please download and have spotify running in the background');
+    }
     device_id = android.toString();
     return android.toString();
-  }
-  else {
-    throw Exception('Failed to get device: ${deviceData.statusCode}');
   }
 }
 
