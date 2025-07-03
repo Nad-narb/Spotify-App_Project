@@ -17,7 +17,9 @@ class RecentlyPlayedPage extends StatefulWidget {
 
 class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
   List<dynamic> _recentTracks = [];
+  String? _currentlyPlayingTrackUri;
   bool _isLoading = false;
+  bool _isPlaying = false;
   String? _error;
 
   Future<void> _loadRecentlyPlayed() async {
@@ -38,6 +40,38 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
       });
     }
   }
+
+    Future<void> playPause(String trackUri) async {
+      try {
+        if (_currentlyPlayingTrackUri == trackUri && _isPlaying) {
+          // Pause if currently playing this track
+          await pauseTrack();
+          setState(() {
+            _isPlaying = false;
+          });
+        } else {
+          // Play if different track or not playing
+          await playTrack(trackUri);
+          setState(() {
+            _currentlyPlayingTrackUri = trackUri;
+            _isPlaying = true;
+          });
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        setState(() {
+          _currentlyPlayingTrackUri = null;
+          _isPlaying = false;
+        });
+      }
+    }
+
+
 
   String _formatTimeAgo(String playedAt) {
     try {
@@ -183,7 +217,17 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
                           ),
                       ],
                     ),
-                    trailing: Icon(Icons.play_arrow),
+                    trailing: IconButton(
+                  icon: Icon(
+                  _currentlyPlayingTrackUri == trackItem['uri'] && _isPlaying
+                  ? Icons.pause
+                      : Icons.play_arrow,
+                  ),
+                  onPressed: () async {
+                    final trackUri = trackItem["uri"] as String;
+                    await playPause(trackUri);
+                  },
+                ),
                   ),
                 );
               },
