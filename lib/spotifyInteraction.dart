@@ -6,6 +6,7 @@ import 'package:oauth2_client/oauth2_client.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SpotifyOAuth2Client extends OAuth2Client {
   SpotifyOAuth2Client({
@@ -21,12 +22,12 @@ class SpotifyOAuth2Client extends OAuth2Client {
 
 const String CLIENT_ID = 'f211c4add0944080bda55bd11f40dd17';
 const String CLIENT_SECRET = 'd520773dd34343a2b2b795913796c5a8';
-String? ACCESS_TOKEN = "";
-String? REFRESH_TOKEN = "";
-String  device_id = "";
+final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
 class SpotifyService {
+
   static Future<AccessTokenResponse?> authenticate() async {
+    try {
       final client = SpotifyOAuth2Client(
         customUriScheme: 'my.music.app',
         redirectUri: 'my.music.app://callback',
@@ -51,14 +52,24 @@ class SpotifyService {
         clientId: CLIENT_ID,
         clientSecret: CLIENT_SECRET,
       );
-      ACCESS_TOKEN = token.accessToken;
-      REFRESH_TOKEN = token.refreshToken;
+
+      // Save tokens securely
+      await _storage.write(key: 'access_token', value: token.accessToken);
+      await _storage.write(key: 'refresh_token', value: token.refreshToken);
+      await _storage.write(key: 'expires_at',
+          value: DateTime.now().add(Duration(seconds: token.expiresIn!)).toIso8601String());
+
       return token;
+    } catch (e) {
+      debugPrint('Authentication error: $e');
+      return null;
+    }
   }
 
   static Future<AccessTokenResponse?> refreshAccessToken() async {
     try {
-      if (REFRESH_TOKEN == null || REFRESH_TOKEN!.isEmpty) {
+      final refreshToken = await _storage.read(key: 'refresh_token');
+      if (refreshToken == null) {
         debugPrint('No refresh token available');
         return null;
       }
@@ -69,59 +80,115 @@ class SpotifyService {
       );
 
       final token = await client.refreshToken(
-        REFRESH_TOKEN.toString(),
+        _storage.read(key: 'refresh_token').toString(),
         clientId: CLIENT_ID,
         clientSecret: CLIENT_SECRET,
       );
 
-      ACCESS_TOKEN = token.accessToken;
-      // Spotify may or may not return a new refresh token
-      // If they do, update it, otherwise keep the old one
+      // Update stored tokens
+      await _storage.write(key: 'access_token', value: token.accessToken);
       if (token.refreshToken != null) {
-        REFRESH_TOKEN = token.refreshToken;
+        await _storage.write(key: 'refresh_token', value: token.refreshToken);
       }
+      await _storage.write(key: 'expires_at',
+          value: DateTime.now().add(Duration(seconds: token.expiresIn!)).toIso8601String());
 
       return token;
     } catch (e) {
       debugPrint('Token refresh error: $e');
+      // If refresh fails, clear tokens (user will need to login again)
+      await _storage.delete(key: 'access_token');
+      await _storage.delete(key: 'refresh_token');
+      await _storage.delete(key: 'expires_at');
       return null;
     }
+  }
+
+  static Future<bool> isLoggedIn() async {
+    final accessToken = await _storage.read(key: 'access_token');
+    return accessToken != null;
   }
 
   static Future<String?> getValidAccessToken() async {
-    if (ACCESS_TOKEN == null || ACCESS_TOKEN!.isEmpty) {
-      return null;
+    final expiresAt = await _storage.read(key: 'expires_at');
+    if (expiresAt != null) {
+      final expiryDate = DateTime.parse(expiresAt);
+      if (expiryDate.isBefore(DateTime.now())) {
+        // Token expired, try to refresh
+        final refreshed = await refreshAccessToken();
+        if (refreshed != null) {
+          return refreshed.accessToken;
+        }
+        return null;
+      }
     }
-    return ACCESS_TOKEN;
+
+    return await _storage.read(key: 'access_token');
+  }
+
+  static Future<void> logout() async {
+    await _storage.delete(key: 'access_token');
+    await _storage.delete(key: 'refresh_token');
+    await _storage.delete(key: 'expires_at');
   }
 }
 
-Future<void> checkTokens() async {
-  checkTokens;
-  String? accessToken = await SpotifyService.getValidAccessToken();
+Future<void> login() async {
+  if (await SpotifyService.isLoggedIn()) {
+    // User is already logged in
+    return;
+  }
+
+  final token = await SpotifyService.authenticate();
+  if (token != null) {
+    // Login successful
+    // Fetch user profile if needed
+  } else {
+    // Handle login failure
+  }
+}
+
+Future<void> makeSpotifyApiCall() async {
+  final accessToken = await SpotifyService.getValidAccessToken();
+
   if (accessToken == null) {
-    // Need to authenticate or refresh token
-    final refreshed = await SpotifyService.refreshAccessToken();
-    if (refreshed == null) {
-      // Need full authentication
-      await SpotifyService.authenticate();
-    }
-    accessToken = ACCESS_TOKEN;
+    // Not logged in or token refresh failed
+    await login(); // Show login screen
+    return;
   }
-  // Now use accessToken for your API calls
+
+  try {
+    // Make your API call with the accessToken
+    final response = await http.get(
+      Uri.parse('https://api.spotify.com/v1/me'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+
+    if (response.statusCode == 401) {
+      // Token might be invalid, try to refresh
+      final newToken = await SpotifyService.refreshAccessToken();
+      if (newToken != null) {
+        // Retry the request with new token
+        return makeSpotifyApiCall();
+      } else {
+        // Force login
+        await login();
+      }
+    }
+    // Process successful response
+  } catch (e) {
+    debugPrint('API call error: $e');
+  }
 }
 
-
-
-Future<void> resetKeys() async {
-  ACCESS_TOKEN = "";
-  REFRESH_TOKEN = "";
-  device_id = "";
-
+Future<void> logout() async {
+  await SpotifyService.logout();
+  // Update UI to show logged out state
 }
 
 Future<List<dynamic>> getTopTracksShort() async {
-  checkTokens;
+  makeSpotifyApiCall;
+  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50'),
     headers: {
@@ -139,7 +206,8 @@ Future<List<dynamic>> getTopTracksShort() async {
 }
 
 Future<List<dynamic>> getTopTracksMedium() async {
-  checkTokens;
+  makeSpotifyApiCall;
+  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/tracks?time_range=medium_term&limit=50'),
     headers: {
@@ -157,7 +225,8 @@ Future<List<dynamic>> getTopTracksMedium() async {
 }
 
 Future<List<dynamic>> getTopTracksLong() async {
-  checkTokens;
+  makeSpotifyApiCall;
+  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=50'),
     headers: {
@@ -175,7 +244,8 @@ Future<List<dynamic>> getTopTracksLong() async {
 }
 
 Future<List<dynamic>> getTopArtistsShort() async {
-  checkTokens;
+  makeSpotifyApiCall;
+  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50'),
     headers: {
@@ -193,7 +263,8 @@ Future<List<dynamic>> getTopArtistsShort() async {
 }
 
 Future<List<dynamic>> getTopArtistsMedium() async {
-  checkTokens;
+  makeSpotifyApiCall;
+  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=50'),
     headers: {
@@ -211,7 +282,8 @@ Future<List<dynamic>> getTopArtistsMedium() async {
 }
 
 Future<List<dynamic>> getTopArtistsLong() async {
-  checkTokens;
+  makeSpotifyApiCall;
+  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50'),
     headers: {
@@ -229,7 +301,8 @@ Future<List<dynamic>> getTopArtistsLong() async {
 }
 
 Future<List<dynamic>> getRecentlyPlayed() async {
-  checkTokens;
+  makeSpotifyApiCall;
+  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/player/recently-played?limit=50'),
     headers: {
@@ -261,7 +334,8 @@ Future<List<dynamic>> getRecentlyPlayed() async {
 }
 
 Future<Map<String, List<String>>> getTopGenres() async {
-  checkTokens;
+  makeSpotifyApiCall;
+  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
   final topArtists = await getTopArtistsMedium();
   final Map<String, int> genreCount = {};
   final Map<String, List<String>> genreArtists = {};
@@ -297,7 +371,8 @@ Future<Map<String, List<String>>> getTopGenres() async {
 }
 
 Future<dynamic> getID() async {
-  checkTokens;
+  makeSpotifyApiCall;
+  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
   var deviceData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/player/devices'),
     headers: {
@@ -312,13 +387,15 @@ Future<dynamic> getID() async {
     if (devices.isEmpty) {
       throw Exception('Please download and have spotify running in the background');
     }
-    device_id = android.toString();
+    await _storage.write(key: 'device_id', value: android.toString());
     return android.toString();
   }
 }
 
 Future<void> playTrack(String trackUri) async {
-  checkTokens;
+  makeSpotifyApiCall;
+  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
+  String device_id = _storage.read(key: 'device_id').toString();
   if(device_id.isEmpty){
     device_id = await getID();
   }
@@ -340,7 +417,9 @@ Future<void> playTrack(String trackUri) async {
 }
 
 Future<void> pauseTrack() async {
-  checkTokens;
+  makeSpotifyApiCall;
+  final ACCESS_TOKEN = await _storage.read(key: 'access_token');
+  String device_id = _storage.read(key: 'device_id').toString();
   if (device_id.isEmpty) {
     device_id = await getID();
   }
