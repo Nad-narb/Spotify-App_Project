@@ -23,6 +23,7 @@ const String CLIENT_ID = 'f211c4add0944080bda55bd11f40dd17';
 const String CLIENT_SECRET = 'd520773dd34343a2b2b795913796c5a8';
 String? ACCESS_TOKEN = "";
 String? REFRESH_TOKEN = "";
+String  device_id = "";
 
 class SpotifyService {
   static Future<AccessTokenResponse?> authenticate() async {
@@ -228,6 +229,7 @@ Future<String> getID() async {
     final data = convert.jsonDecode(deviceData.body);
     final devices = data['devices'] as List<dynamic>;
     final android = devices[0]["id"];
+    device_id = android.toString();
     return android.toString();
   }
   else {
@@ -236,15 +238,18 @@ Future<String> getID() async {
 }
 
 Future<void> playTrack(String trackUri) async {
-  final id = await getID();
+  if(device_id.isEmpty){
+    device_id = await getID();
+  }
   final response = await http.put(
-    Uri.parse('https://api.spotify.com/v1/me/player/play?device_id=' + id),
+    Uri.parse('https://api.spotify.com/v1/me/player/play?device_id=' + device_id),
     headers: {
       "Authorization": 'Bearer $ACCESS_TOKEN',
       "Content-Type": 'application/json',
     },
     body: convert.jsonEncode({
       "uris": [trackUri],
+      "position_ms": 5000
     }),
   );
 
@@ -253,6 +258,22 @@ Future<void> playTrack(String trackUri) async {
   }
 }
 
+Future<void> pauseTrack() async {
+  if (device_id.isEmpty) {
+    device_id = await getID();
+  }
+  final response = await http.put(
+    Uri.parse('https://api.spotify.com/v1/me/player/pause?device_id=$device_id'),
+    headers: {
+      "Authorization": 'Bearer $ACCESS_TOKEN',
+      "Content-Type": 'application/json',
+    },
+  );
+
+  if (response.statusCode != 204 && response.statusCode != 200) {
+    throw Exception('Failed to pause: ${response.statusCode} - ${response.body}');
+  }
+}
 
 
 
