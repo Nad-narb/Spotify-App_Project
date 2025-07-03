@@ -19,8 +19,10 @@ class _TracksPageState extends State<TracksPage> {
   List<dynamic> _tracksShort = [];
   List<dynamic> _tracksMedium = [];
   List<dynamic> _tracksLong = [];
+  String? _currentlyPlayingTrackUri;
   int _selectedTimeRange = 0;
   bool _isLoading = false;
+  bool _isPlaying = false;
   String? _error;
 
   Future<void> _loadTopTracks() async {
@@ -50,6 +52,36 @@ class _TracksPageState extends State<TracksPage> {
   void initState() {
     super.initState();
     _loadTopTracks();
+  }
+
+  Future<void> playPause(String trackUri) async {
+    try {
+      if (_currentlyPlayingTrackUri == trackUri && _isPlaying) {
+        // Pause if currently playing this track
+        await pauseTrack();
+        setState(() {
+          _isPlaying = false;
+        });
+      } else {
+        // Play if different track or not playing
+        await playTrack(trackUri);
+        setState(() {
+          _currentlyPlayingTrackUri = trackUri;
+          _isPlaying = true;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      setState(() {
+        _currentlyPlayingTrackUri = null;
+        _isPlaying = false;
+      });
+    }
   }
 
   List<dynamic> get _currentTracks {
@@ -249,11 +281,14 @@ class _TracksPageState extends State<TracksPage> {
                         ),
                         // Play button
                         IconButton(
-                          icon: const Icon(Icons.play_arrow),
-                          onPressed: () {
+                          icon: Icon(
+                            _currentlyPlayingTrackUri == track['uri'] && _isPlaying
+                                ? Icons.pause
+                                : Icons.play_arrow,
+                          ),
+                          onPressed: () async {
                             final trackUri = track["uri"] as String;
-                            playTrack(trackUri);
-                            // Add play functionality here
+                            await playPause(trackUri);
                           },
                         ),
                       ],
