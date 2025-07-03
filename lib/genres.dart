@@ -7,6 +7,7 @@ import 'artists.dart';
 import 'tracks.dart';
 import 'spotifyInteraction.dart';
 import 'recentlyPlayed.dart';
+import 'main.dart';
 
 class BarChartSample1 extends StatefulWidget {
   BarChartSample1({Key? key, required this.title}) : super(key: key);
@@ -138,6 +139,16 @@ class BarChartSample1State extends State<BarChartSample1> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => RecentlyPlayedPage(title: "Recently Played")),
+              );
+            },
+          ),
+          ListTile(
+            title: const Text('Logout' , style: TextStyle(color: Colors.black)),
+            onTap: () {
+              resetKeys;
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyHomePage(title: "Spotilytics")),
               );
             },
           ),

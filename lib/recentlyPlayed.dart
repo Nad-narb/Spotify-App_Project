@@ -6,6 +6,7 @@ import 'artists.dart';
 import 'genres.dart';
 import 'tracks.dart';
 import 'package:intl/intl.dart';
+import 'main.dart';
 
 class RecentlyPlayedPage extends StatefulWidget {
   RecentlyPlayedPage({Key? key, required this.title}) : super(key: key);
@@ -161,6 +162,16 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
               title: const Text('Recently Played', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
               onTap: () {
                 Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Logout' , style: TextStyle(color: Colors.black)),
+              onTap: () {
+                resetKeys;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyHomePage(title: "Spotilytics")),
+                );
               },
             ),
           ],

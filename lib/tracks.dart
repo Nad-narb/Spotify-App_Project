@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:spotifysdk/genres.dart';
+import 'package:spotifysdk/main.dart';
 import './spotifyInteraction.dart';
 import 'package:animated_button_bar/animated_button_bar.dart';
 import 'artists.dart';
 import 'genres.dart';
 import 'recentlyPlayed.dart';
+import 'main.dart';
 
 
 class TracksPage extends StatefulWidget {
@@ -152,6 +154,16 @@ class _TracksPageState extends State<TracksPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => RecentlyPlayedPage(title: "Recently Played")),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('Logout' , style: TextStyle(color: Colors.black)),
+              onTap: () {
+                resetKeys;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyHomePage(title: "Spotilytics")),
                 );
               },
             ),

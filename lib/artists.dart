@@ -4,6 +4,7 @@ import 'package:animated_button_bar/animated_button_bar.dart';
 import 'tracks.dart';
 import 'genres.dart';
 import 'recentlyPlayed.dart';
+import 'main.dart';
 
 class ArtistsPage extends StatefulWidget {
   ArtistsPage({Key? key, required this.title}) : super(key: key);
@@ -118,6 +119,16 @@ class _ArtistsPageState extends State<ArtistsPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => RecentlyPlayedPage(title: "Recently Played")),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('Logout' , style: TextStyle(color: Colors.black)),
+              onTap: () {
+                resetKeys;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyHomePage(title: "Spotilytics")),
                 );
               },
             ),
