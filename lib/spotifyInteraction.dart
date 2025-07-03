@@ -62,6 +62,14 @@ class SpotifyService {
   }
 }
 
+
+Future<void> resetKeys() async {
+  ACCESS_TOKEN = "";
+  REFRESH_TOKEN = "";
+  device_id = "";
+
+}
+
 Future<List<dynamic>> getTopTracksShort() async {
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50'),
@@ -194,7 +202,6 @@ Future<List<dynamic>> getRecentlyPlayed() async {
     throw Exception('Failed to get artists: ${featuredData.statusCode}');
   }
 }
-
 
 Future<Map<String, List<String>>> getTopGenres() async {
   final topArtists = await getTopArtistsMedium();
