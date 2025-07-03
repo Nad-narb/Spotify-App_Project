@@ -160,7 +160,7 @@ class _TracksPageState extends State<TracksPage> {
             ListTile(
               title: const Text('Logout' , style: TextStyle(color: Colors.black)),
               onTap: () {
-                resetKeys;
+                logout;
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => MyHomePage(title: "Spotilytics")),

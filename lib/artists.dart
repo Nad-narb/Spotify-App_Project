@@ -125,7 +125,7 @@ class _ArtistsPageState extends State<ArtistsPage> {
             ListTile(
               title: const Text('Logout' , style: TextStyle(color: Colors.black)),
               onTap: () {
-                resetKeys;
+                logout;
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => MyHomePage(title: "Spotilytics")),

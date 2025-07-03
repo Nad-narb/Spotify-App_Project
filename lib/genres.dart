@@ -145,7 +145,7 @@ class BarChartSample1State extends State<BarChartSample1> {
           ListTile(
             title: const Text('Logout' , style: TextStyle(color: Colors.black)),
             onTap: () {
-              resetKeys;
+              logout;
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => MyHomePage(title: "Spotilytics")),
