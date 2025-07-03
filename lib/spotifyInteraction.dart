@@ -27,7 +27,6 @@ String  device_id = "";
 
 class SpotifyService {
   static Future<AccessTokenResponse?> authenticate() async {
-    try {
       final client = SpotifyOAuth2Client(
         customUriScheme: 'my.music.app',
         redirectUri: 'my.music.app://callback',
@@ -55,12 +54,63 @@ class SpotifyService {
       ACCESS_TOKEN = token.accessToken;
       REFRESH_TOKEN = token.refreshToken;
       return token;
+  }
+
+  static Future<AccessTokenResponse?> refreshAccessToken() async {
+    try {
+      if (REFRESH_TOKEN == null || REFRESH_TOKEN!.isEmpty) {
+        debugPrint('No refresh token available');
+        return null;
+      }
+
+      final client = SpotifyOAuth2Client(
+        customUriScheme: 'my.music.app',
+        redirectUri: 'my.music.app://callback',
+      );
+
+      final token = await client.refreshToken(
+        REFRESH_TOKEN.toString(),
+        clientId: CLIENT_ID,
+        clientSecret: CLIENT_SECRET,
+      );
+
+      ACCESS_TOKEN = token.accessToken;
+      // Spotify may or may not return a new refresh token
+      // If they do, update it, otherwise keep the old one
+      if (token.refreshToken != null) {
+        REFRESH_TOKEN = token.refreshToken;
+      }
+
+      return token;
     } catch (e) {
-      debugPrint('Authentication error: $e');
+      debugPrint('Token refresh error: $e');
       return null;
     }
   }
+
+  static Future<String?> getValidAccessToken() async {
+    if (ACCESS_TOKEN == null || ACCESS_TOKEN!.isEmpty) {
+      return null;
+    }
+    return ACCESS_TOKEN;
+  }
 }
+
+Future<void> checkTokens() async {
+  checkTokens;
+  String? accessToken = await SpotifyService.getValidAccessToken();
+  if (accessToken == null) {
+    // Need to authenticate or refresh token
+    final refreshed = await SpotifyService.refreshAccessToken();
+    if (refreshed == null) {
+      // Need full authentication
+      await SpotifyService.authenticate();
+    }
+    accessToken = ACCESS_TOKEN;
+  }
+  // Now use accessToken for your API calls
+}
+
 
 
 Future<void> resetKeys() async {
@@ -71,6 +121,7 @@ Future<void> resetKeys() async {
 }
 
 Future<List<dynamic>> getTopTracksShort() async {
+  checkTokens;
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50'),
     headers: {
@@ -88,6 +139,7 @@ Future<List<dynamic>> getTopTracksShort() async {
 }
 
 Future<List<dynamic>> getTopTracksMedium() async {
+  checkTokens;
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/tracks?time_range=medium_term&limit=50'),
     headers: {
@@ -105,6 +157,7 @@ Future<List<dynamic>> getTopTracksMedium() async {
 }
 
 Future<List<dynamic>> getTopTracksLong() async {
+  checkTokens;
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=50'),
     headers: {
@@ -122,6 +175,7 @@ Future<List<dynamic>> getTopTracksLong() async {
 }
 
 Future<List<dynamic>> getTopArtistsShort() async {
+  checkTokens;
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50'),
     headers: {
@@ -139,6 +193,7 @@ Future<List<dynamic>> getTopArtistsShort() async {
 }
 
 Future<List<dynamic>> getTopArtistsMedium() async {
+  checkTokens;
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=50'),
     headers: {
@@ -156,6 +211,7 @@ Future<List<dynamic>> getTopArtistsMedium() async {
 }
 
 Future<List<dynamic>> getTopArtistsLong() async {
+  checkTokens;
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50'),
     headers: {
@@ -173,6 +229,7 @@ Future<List<dynamic>> getTopArtistsLong() async {
 }
 
 Future<List<dynamic>> getRecentlyPlayed() async {
+  checkTokens;
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/player/recently-played?limit=50'),
     headers: {
@@ -204,6 +261,7 @@ Future<List<dynamic>> getRecentlyPlayed() async {
 }
 
 Future<Map<String, List<String>>> getTopGenres() async {
+  checkTokens;
   final topArtists = await getTopArtistsMedium();
   final Map<String, int> genreCount = {};
   final Map<String, List<String>> genreArtists = {};
@@ -239,6 +297,7 @@ Future<Map<String, List<String>>> getTopGenres() async {
 }
 
 Future<dynamic> getID() async {
+  checkTokens;
   var deviceData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/player/devices'),
     headers: {
@@ -259,6 +318,7 @@ Future<dynamic> getID() async {
 }
 
 Future<void> playTrack(String trackUri) async {
+  checkTokens;
   if(device_id.isEmpty){
     device_id = await getID();
   }
@@ -280,6 +340,7 @@ Future<void> playTrack(String trackUri) async {
 }
 
 Future<void> pauseTrack() async {
+  checkTokens;
   if (device_id.isEmpty) {
     device_id = await getID();
   }
