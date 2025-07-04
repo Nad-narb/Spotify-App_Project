@@ -102,6 +102,7 @@ class _TracksPageState extends State<TracksPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Color(0xFF121212),
       appBar: AppBar(
         title: Text(widget.title),
         automaticallyImplyLeading: false,
@@ -109,8 +110,7 @@ class _TracksPageState extends State<TracksPage> {
           builder: (context) {
             return IconButton(
               icon: const Icon(Icons.menu),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
+              onPressed: () {                Scaffold.of(context).openDrawer();
               },
             );
           },
@@ -122,6 +122,7 @@ class _TracksPageState extends State<TracksPage> {
         ],
       ),
       drawer: Drawer(
+        //backgroundColor: Color(0xFF121212),
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -183,24 +184,24 @@ class _TracksPageState extends State<TracksPage> {
             child: AnimatedButtonBar(
               radius: 8.0,
               padding: const EdgeInsets.all(16.0),
-              backgroundColor: Theme.of(context).colorScheme.background,
-              foregroundColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: const Color(0xFF202020),
+              foregroundColor: Color(0xFF1ED760),
               elevation: 2,
-              borderColor: Theme.of(context).colorScheme.primary,
+              borderColor: const Color(0xFF1ED760),
               borderWidth: 2,
               innerVerticalPadding: 8,
               children: [
                 ButtonBarEntry(
                   onTap: () => setState(() => _selectedTimeRange = 0),
-                  child: Text('4 Weeks'),
+                  child: Text('4 Weeks', style: TextStyle(color: Colors.white),),
                 ),
                 ButtonBarEntry(
                   onTap: () => setState(() => _selectedTimeRange = 1),
-                  child: Text('6 Months'),
+                  child: Text('6 Months', style: TextStyle(color: Colors.white),),
                 ),
                 ButtonBarEntry(
                   onTap: () => setState(() => _selectedTimeRange = 2),
-                  child: Text('12 Months'),
+                  child: Text('12 Months', style: TextStyle(color: Colors.white),),
                 ),
               ],
             ),
@@ -222,6 +223,7 @@ class _TracksPageState extends State<TracksPage> {
                 final artists = (track['artists'] as List?)?.map<String>((a) => (a as Map)['name'] as String? ?? '').join(', ') ?? 'Unknown artist';
 
                 return Card(
+                  color: Color(0xFF181818),
                   elevation: 2,
                   margin: const EdgeInsets.symmetric(vertical: 8),
                   shape: RoundedRectangleBorder(
@@ -240,7 +242,7 @@ class _TracksPageState extends State<TracksPage> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.grey[600],
+                              color: Color(0xFF1ED760),
                             ),
                           ),
                         ),
@@ -279,6 +281,7 @@ class _TracksPageState extends State<TracksPage> {
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
+                                  color: Color(0xFFFFFFFF),
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -288,7 +291,7 @@ class _TracksPageState extends State<TracksPage> {
                                 artists,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Colors.grey[600],
+                                  color: Color(0xFF9CA3AF),
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -303,6 +306,7 @@ class _TracksPageState extends State<TracksPage> {
                                 ? Icons.pause
                                 : Icons.play_arrow,
                           ),
+                          color: Color(0xFF1ED760),
                           onPressed: () async {
                             final trackUri = track["uri"] as String;
                             await playPause(trackUri);
