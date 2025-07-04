@@ -1,5 +1,5 @@
 import 'dart:ffi';
-
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:oauth2_client/access_token_response.dart';
 import 'package:oauth2_client/oauth2_client.dart';
@@ -23,6 +23,7 @@ class SpotifyOAuth2Client extends OAuth2Client {
 const String CLIENT_ID = 'f211c4add0944080bda55bd11f40dd17';
 const String CLIENT_SECRET = 'd520773dd34343a2b2b795913796c5a8';
 final FlutterSecureStorage _storage = const FlutterSecureStorage();
+Random random = new Random();
 
 class SpotifyService {
 
@@ -401,6 +402,7 @@ Future<String> getDeviceId() async {
 
 Future<void> playTrack(String trackUri) async {
   try {
+    int offset = random.nextInt(100) + 10;
     final accessToken = await SpotifyService.getValidAccessToken();
     if (accessToken == null) {
       throw Exception('Not authenticated');
@@ -416,7 +418,7 @@ Future<void> playTrack(String trackUri) async {
       },
       body: convert.jsonEncode({
         'uris': [trackUri],
-        'position_ms': 5000
+        'position_ms': offset * 1000
       }),
     );
 
