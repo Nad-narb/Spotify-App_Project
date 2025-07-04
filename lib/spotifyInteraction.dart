@@ -56,8 +56,6 @@ class SpotifyService {
       // Save tokens securely
       await _storage.write(key: 'access_token', value: token.accessToken);
       await _storage.write(key: 'refresh_token', value: token.refreshToken);
-      await _storage.write(key: 'expires_at',
-          value: DateTime.now().add(Duration(seconds: token.expiresIn!)).toIso8601String());
 
       return token;
     } catch (e) {
@@ -80,7 +78,7 @@ class SpotifyService {
       );
 
       final token = await client.refreshToken(
-        _storage.read(key: 'refresh_token').toString(),
+        refreshToken,
         clientId: CLIENT_ID,
         clientSecret: CLIENT_SECRET,
       );
@@ -90,16 +88,12 @@ class SpotifyService {
       if (token.refreshToken != null) {
         await _storage.write(key: 'refresh_token', value: token.refreshToken);
       }
-      await _storage.write(key: 'expires_at',
-          value: DateTime.now().add(Duration(seconds: token.expiresIn!)).toIso8601String());
-
       return token;
     } catch (e) {
       debugPrint('Token refresh error: $e');
       // If refresh fails, clear tokens (user will need to login again)
       await _storage.delete(key: 'access_token');
       await _storage.delete(key: 'refresh_token');
-      await _storage.delete(key: 'expires_at');
       return null;
     }
   }
@@ -110,26 +104,27 @@ class SpotifyService {
   }
 
   static Future<String?> getValidAccessToken() async {
-    final expiresAt = await _storage.read(key: 'expires_at');
-    if (expiresAt != null) {
-      final expiryDate = DateTime.parse(expiresAt);
-      if (expiryDate.isBefore(DateTime.now())) {
-        // Token expired, try to refresh
+    final ACCESS_TOKEN = await _storage.read(key: 'access_token');
+    var accessCode = await http.get(
+      Uri.parse('https://api.spotify.com/v1/artists/213zHiFZwtDVEqyxeCbk07'),
+      headers: {
+        "content-type": 'application/json',
+        "authorization": 'Bearer $ACCESS_TOKEN',
+      },
+    );
+    if(accessCode.statusCode == 401)
+      {
         final refreshed = await refreshAccessToken();
         if (refreshed != null) {
           return refreshed.accessToken;
         }
         return null;
-      }
     }
-
-    return await _storage.read(key: 'access_token');
+    return ACCESS_TOKEN;
   }
 
   static Future<void> logout() async {
-    await _storage.delete(key: 'access_token');
-    await _storage.delete(key: 'refresh_token');
-    await _storage.delete(key: 'expires_at');
+    await _storage.deleteAll();
   }
 }
 
@@ -148,6 +143,7 @@ Future<void> login() async {
   }
 }
 
+/*
 Future<void> makeSpotifyApiCall() async {
   final ACCESS_TOKEN = await SpotifyService.getValidAccessToken();
   if (ACCESS_TOKEN == null) {
@@ -179,6 +175,7 @@ Future<void> makeSpotifyApiCall() async {
     debugPrint('API call error: $e');
   }
 }
+*/
 
 Future<void> logout() async {
   await SpotifyService.logout();
@@ -356,7 +353,6 @@ Future<Map<String, List<String>>> getTopGenres() async {
     final genre = entry.key;
     sortedGenreArtists[genre] = genreArtists[genre] ?? [];
   }
-  debugPrint("Genre Count error");
   return sortedGenreArtists;
 }
 
