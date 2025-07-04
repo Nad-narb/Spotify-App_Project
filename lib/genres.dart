@@ -8,6 +8,7 @@ import 'tracks.dart';
 import 'spotifyInteraction.dart';
 import 'recentlyPlayed.dart';
 import 'main.dart';
+import 'package:gif/gif.dart';
 
 class BarChartSample1 extends StatefulWidget {
   BarChartSample1({Key? key, required this.title}) : super(key: key);
@@ -29,7 +30,8 @@ class BarChartSample1 extends StatefulWidget {
 @override
 State<StatefulWidget> createState() => BarChartSample1State();
 }
-class BarChartSample1State extends State<BarChartSample1> {
+class BarChartSample1State extends State<BarChartSample1> with TickerProviderStateMixin {
+  late final GifController controller1;
   Map<String, List<String>> genreMap = {};
   List<String> genreKeys = [];
   final Duration animDuration = const Duration(milliseconds: 250);
@@ -40,6 +42,7 @@ class BarChartSample1State extends State<BarChartSample1> {
 
   @override
   void initState() {
+    controller1 = GifController(vsync: this);
     _loadGenreData();
     super.initState();
   }
@@ -114,9 +117,14 @@ class BarChartSample1State extends State<BarChartSample1> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(color: Colors.blue),
-            child: Text('Drawer Header'),
+          DrawerHeader(
+            decoration: BoxDecoration(),
+            child: Gif(
+              fps: 30,
+              autostart: Autostart.loop,
+              image: AssetImage('assets/cassette.gif'),
+              fit: BoxFit.cover,
+            ),
           ),
           ListTile(
             title: const Text('Top Tracks', style: TextStyle(color: Colors.white, fontSize: 20)),

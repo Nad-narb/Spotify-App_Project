@@ -7,6 +7,7 @@ import 'artists.dart';
 import 'genres.dart';
 import 'recentlyPlayed.dart';
 import 'main.dart';
+import 'package:gif/gif.dart';
 
 
 class TracksPage extends StatefulWidget {
@@ -17,7 +18,8 @@ class TracksPage extends StatefulWidget {
   _TracksPageState createState() => _TracksPageState();
 }
 
-class _TracksPageState extends State<TracksPage> {
+class _TracksPageState extends State<TracksPage> with TickerProviderStateMixin{
+  late final GifController controller1;
   List<dynamic> _tracksShort = [];
   List<dynamic> _tracksMedium = [];
   List<dynamic> _tracksLong = [];
@@ -52,8 +54,9 @@ class _TracksPageState extends State<TracksPage> {
 
   @override
   void initState() {
-    super.initState();
+    controller1 = GifController(vsync: this);
     _loadTopTracks();
+    super.initState();
   }
 
   Future<void> playPause(String trackUri) async {
@@ -131,9 +134,14 @@ class _TracksPageState extends State<TracksPage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
-              child: Text('Drawer Header'),
+            DrawerHeader(
+              decoration: BoxDecoration(),
+              child: Gif(
+                fps: 30,
+                autostart: Autostart.loop,
+                image: AssetImage('assets/cassette.gif'),
+                fit: BoxFit.cover,
+              ),
             ),
             ListTile(
               title: const Text('Tracks', style: TextStyle(color: Color(0xFF1ED760), fontWeight: FontWeight.bold, fontSize: 20)),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import './spotifyInteraction.dart';
 import 'package:animated_button_bar/animated_button_bar.dart';
+import 'package:gif/gif.dart';
 import 'tracks.dart';
 import 'genres.dart';
 import 'recentlyPlayed.dart';
@@ -14,7 +15,9 @@ class ArtistsPage extends StatefulWidget {
   _ArtistsPageState createState() => _ArtistsPageState();
 }
 
-class _ArtistsPageState extends State<ArtistsPage> {
+class _ArtistsPageState extends State<ArtistsPage> with TickerProviderStateMixin{
+  late final GifController controller1;
+  int _fps = 30;
   List<dynamic> _artistsShort = [];
   List<dynamic> _artistsMedium = [];
   List<dynamic> _artistsLong = [];
@@ -47,8 +50,9 @@ class _ArtistsPageState extends State<ArtistsPage> {
 
   @override
   void initState() {
-    super.initState();
+    controller1 = GifController(vsync: this);
     _loadTopArtists();
+    super.initState();
   }
 
   List<dynamic> get _currentArtists {
@@ -97,9 +101,14 @@ class _ArtistsPageState extends State<ArtistsPage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
-              child: Text('Drawer Header'),
+            DrawerHeader(
+              decoration: BoxDecoration(),
+              child: Gif(
+                      fps: 30,
+                autostart: Autostart.loop,
+                image: AssetImage('assets/cassette.gif'),
+                fit: BoxFit.cover,
+              ),
             ),
             ListTile(
               title: const Text('Tracks', style: TextStyle(color: Colors.white, fontSize: 20)),

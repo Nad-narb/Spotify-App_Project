@@ -7,6 +7,7 @@ import 'genres.dart';
 import 'tracks.dart';
 import 'package:intl/intl.dart';
 import 'main.dart';
+import 'package:gif/gif.dart';
 
 class RecentlyPlayedPage extends StatefulWidget {
   RecentlyPlayedPage({Key? key, required this.title}) : super(key: key);
@@ -16,7 +17,8 @@ class RecentlyPlayedPage extends StatefulWidget {
   _RecentlyPlayedPageState createState() => _RecentlyPlayedPageState();
 }
 
-class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
+class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> with TickerProviderStateMixin{
+  late final GifController controller1;
   List<dynamic> _recentTracks = [];
   String? _currentlyPlayingTrackUri;
   bool _isLoading = false;
@@ -102,8 +104,9 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
 
   @override
   void initState() {
-    super.initState();
+    controller1 = GifController(vsync: this);
     _loadRecentlyPlayed();
+    super.initState();
   }
 
   @override
@@ -139,9 +142,14 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
-              child: Text('Drawer Header'),
+            DrawerHeader(
+              decoration: BoxDecoration(),
+              child: Gif(
+                fps: 30,
+                autostart: Autostart.loop,
+                image: AssetImage('assets/cassette.gif'),
+                fit: BoxFit.cover,
+              ),
             ),
             ListTile(
               title: const Text('Tracks', style: TextStyle(color: Colors.white, fontSize: 20)),
@@ -233,11 +241,11 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
                       children: [
                         Text(
                           (trackItem['artists'] as List?)?.map<String>((a) => (a as Map)['name'] as String? ?? '').join(', ') ?? 'Unknown artist',
-                        style: TextStyle(color: Color(0xFFFFFFFF)),),
+                        style: TextStyle(color: Colors.grey[500]),),
                         if (playedAt.isNotEmpty)
                           Text(
                             _formatTimeAgo(playedAt),
-                            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 12),
+                            style: TextStyle(color: Colors.grey[500], fontSize: 12),
                           ),
                       ],
                     ),
