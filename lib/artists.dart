@@ -67,8 +67,14 @@ class _ArtistsPageState extends State<ArtistsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFF121212),
       appBar: AppBar(
-        title: Text(widget.title),
+        backgroundColor: Color(0x000000F2),
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(widget.title,
+          style: TextStyle(color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 30,),),
         automaticallyImplyLeading: false,
         leading: Builder(
           builder: (context) {
@@ -87,6 +93,7 @@ class _ArtistsPageState extends State<ArtistsPage> {
         ],
       ),
       drawer: Drawer(
+        backgroundColor: Color(0xFF181818),
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -95,7 +102,7 @@ class _ArtistsPageState extends State<ArtistsPage> {
               child: Text('Drawer Header'),
             ),
             ListTile(
-              title: const Text('Tracks', style: TextStyle(color: Colors.black)),
+              title: const Text('Tracks', style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -104,13 +111,13 @@ class _ArtistsPageState extends State<ArtistsPage> {
               },
             ),
             ListTile(
-              title: const Text('Artists', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+              title: const Text('Artists', style: TextStyle(color: Color(0xFF1ED760), fontWeight: FontWeight.bold, fontSize: 20)),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: const Text('Genres', style: TextStyle(color: Colors.black)),
+              title: const Text('Genres', style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -119,7 +126,7 @@ class _ArtistsPageState extends State<ArtistsPage> {
               },
             ),
             ListTile(
-              title: const Text('Recently Played', style: TextStyle(color: Colors.black)),
+              title: const Text('Recently Played', style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -128,7 +135,7 @@ class _ArtistsPageState extends State<ArtistsPage> {
               },
             ),
             ListTile(
-              title: const Text('Logout' , style: TextStyle(color: Colors.black)),
+              title: const Text('Logout' , style: TextStyle(color: Colors.white, fontSize: 16)),
               onTap: () {
                 logout;
                 Navigator.push(
@@ -148,24 +155,24 @@ class _ArtistsPageState extends State<ArtistsPage> {
             child: AnimatedButtonBar(
               radius: 8.0,
               padding: const EdgeInsets.all(16.0),
-              backgroundColor: Theme.of(context).colorScheme.background,
-              foregroundColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: const Color(0xFF202020),
+              foregroundColor: Color(0xFF1ED760),
               elevation: 2,
-              borderColor: Theme.of(context).colorScheme.primary,
+              borderColor: const Color(0xFF1ED760),
               borderWidth: 2,
               innerVerticalPadding: 8,
               children: [
                 ButtonBarEntry(
                   onTap: () => setState(() => _selectedTimeRange = 0),
-                  child: Text('4 Weeks'),
+                  child: Text('4 Weeks', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),
                 ),
                 ButtonBarEntry(
                   onTap: () => setState(() => _selectedTimeRange = 1),
-                  child: Text('6 Months'),
+                  child: Text('6 Months', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),
                 ),
                 ButtonBarEntry(
                   onTap: () => setState(() => _selectedTimeRange = 2),
-                  child: Text('12 Months'),
+                  child: Text('12 Months', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),
                 ),
               ],
             ),
@@ -173,7 +180,7 @@ class _ArtistsPageState extends State<ArtistsPage> {
           // Artist list
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator(color:Color(0xFF1ED760)))
                 : _error != null
                 ? Center(child: Text(_error!))
                 : _currentArtists.isEmpty
@@ -187,6 +194,7 @@ class _ArtistsPageState extends State<ArtistsPage> {
                 final genres = (artist['genres'] as List<dynamic>?)?.join(', ') ?? 'No genres listed';
 
                 return Card(
+                  color: Color(0xFF252525),
                   elevation: 2,
                   margin: const EdgeInsets.symmetric(vertical: 8),
                   shape: RoundedRectangleBorder(
@@ -205,7 +213,7 @@ class _ArtistsPageState extends State<ArtistsPage> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.grey[600],
+                              color: Color(0xFF1ED760),
                             ),
                           ),
                         ),
@@ -237,6 +245,7 @@ class _ArtistsPageState extends State<ArtistsPage> {
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
+                                  color: Color(0xFFFFFFFF),
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -245,8 +254,8 @@ class _ArtistsPageState extends State<ArtistsPage> {
                               Text(
                                 genres,
                                 style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
+                                  fontSize: 14,
+                                  color: Color(0xFF9CA3AF),
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,

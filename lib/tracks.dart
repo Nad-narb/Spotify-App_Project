@@ -104,7 +104,12 @@ class _TracksPageState extends State<TracksPage> {
     return Scaffold(
         backgroundColor: Color(0xFF121212),
       appBar: AppBar(
-        title: Text(widget.title),
+        backgroundColor: Color(0x000000F2),
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(widget.title,
+          style: TextStyle(color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 30,),),
         automaticallyImplyLeading: false,
         leading: Builder(
           builder: (context) {
@@ -122,7 +127,7 @@ class _TracksPageState extends State<TracksPage> {
         ],
       ),
       drawer: Drawer(
-        //backgroundColor: Color(0xFF121212),
+        backgroundColor: Color(0xFF181818),
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -131,13 +136,13 @@ class _TracksPageState extends State<TracksPage> {
               child: Text('Drawer Header'),
             ),
             ListTile(
-              title: const Text('Tracks', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+              title: const Text('Tracks', style: TextStyle(color: Color(0xFF1ED760), fontWeight: FontWeight.bold, fontSize: 20)),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: const Text('Artists', style: TextStyle(color: Colors.black)),
+              title: const Text('Artists', style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -146,7 +151,7 @@ class _TracksPageState extends State<TracksPage> {
               },
             ),
             ListTile(
-              title: const Text('Genres', style: TextStyle(color: Colors.black)),
+              title: const Text('Genres', style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -155,7 +160,7 @@ class _TracksPageState extends State<TracksPage> {
               },
             ),
             ListTile(
-              title: const Text('Recently Played' , style: TextStyle(color: Colors.black)),
+              title: const Text('Recently Played' , style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -164,9 +169,9 @@ class _TracksPageState extends State<TracksPage> {
               },
             ),
             ListTile(
-              title: const Text('Logout' , style: TextStyle(color: Colors.black)),
+              title: const Text('Logout' , style: TextStyle(color: Colors.white, fontSize: 16)),
               onTap: () {
-                logout;
+                SpotifyService.logout();
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => MyHomePage(title: "Spotilytics")),
@@ -193,15 +198,15 @@ class _TracksPageState extends State<TracksPage> {
               children: [
                 ButtonBarEntry(
                   onTap: () => setState(() => _selectedTimeRange = 0),
-                  child: Text('4 Weeks', style: TextStyle(color: Colors.white),),
+                  child: Text('4 Weeks', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),
                 ),
                 ButtonBarEntry(
                   onTap: () => setState(() => _selectedTimeRange = 1),
-                  child: Text('6 Months', style: TextStyle(color: Colors.white),),
+                  child: Text('6 Months', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),
                 ),
                 ButtonBarEntry(
                   onTap: () => setState(() => _selectedTimeRange = 2),
-                  child: Text('12 Months', style: TextStyle(color: Colors.white),),
+                  child: Text('12 Months', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),),
                 ),
               ],
             ),
@@ -209,7 +214,7 @@ class _TracksPageState extends State<TracksPage> {
           // Track list
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator(color:Color(0xFF1ED760)))
                 : _error != null
                 ? Center(child: Text(_error!))
                 : _currentTracks.isEmpty
@@ -223,7 +228,7 @@ class _TracksPageState extends State<TracksPage> {
                 final artists = (track['artists'] as List?)?.map<String>((a) => (a as Map)['name'] as String? ?? '').join(', ') ?? 'Unknown artist';
 
                 return Card(
-                  color: Color(0xFF181818),
+                  color: Color(0xFF252525),
                   elevation: 2,
                   margin: const EdgeInsets.symmetric(vertical: 8),
                   shape: RoundedRectangleBorder(

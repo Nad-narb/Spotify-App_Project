@@ -109,8 +109,14 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFF121212),
       appBar: AppBar(
-        title: Text(widget.title),
+        backgroundColor: Color(0x000000F2),
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(widget.title,
+          style: TextStyle(color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 30,),),
         automaticallyImplyLeading: false,
         leading: Builder(
           builder: (context) {
@@ -129,6 +135,7 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
         ],
       ),
       drawer: Drawer(
+        backgroundColor: Color(0xFF181818),
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -137,7 +144,7 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
               child: Text('Drawer Header'),
             ),
             ListTile(
-              title: const Text('Tracks', style: TextStyle(color: Colors.black)),
+              title: const Text('Tracks', style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -146,7 +153,7 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
               },
             ),
             ListTile(
-              title: const Text('Artists', style: TextStyle(color: Colors.black)),
+              title: const Text('Artists', style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -155,7 +162,7 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
               },
             ),
             ListTile(
-              title: const Text('Genres', style: TextStyle(color: Colors.black)),
+              title: const Text('Genres', style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -164,13 +171,13 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
               },
             ),
             ListTile(
-              title: const Text('Recently Played', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+              title: const Text('Recently Played', style: TextStyle(color: Color(0xFF1ED760), fontWeight: FontWeight.bold, fontSize: 20)),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: const Text('Logout' , style: TextStyle(color: Colors.black)),
+              title: const Text('Logout' , style: TextStyle(color: Colors.white, fontSize: 16)),
               onTap: () {
                 logout;
                 Navigator.push(
@@ -187,7 +194,7 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
           // Track list
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator(color:Color(0xFF1ED760)))
                 : _error != null
                 ? Center(child: Text(_error!))
                 : _recentTracks.isEmpty
@@ -200,6 +207,7 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
                 final playedAt = track['played_at'] as String? ?? '';
 
                 return Card(
+                  color: Color(0xFF252525),
                   margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: ListTile(
                     leading:(trackItem['album'] as Map<String, dynamic>?)?['images'] is List
@@ -218,18 +226,18 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
 
                     title: Text(
                       (trackItem['name'] as String?) ?? 'Unknown track',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Color(0xFFFFFFFF), fontWeight: FontWeight.bold),
                     ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           (trackItem['artists'] as List?)?.map<String>((a) => (a as Map)['name'] as String? ?? '').join(', ') ?? 'Unknown artist',
-                        ),
+                        style: TextStyle(color: Color(0xFFFFFFFF)),),
                         if (playedAt.isNotEmpty)
                           Text(
                             _formatTimeAgo(playedAt),
-                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 12),
                           ),
                       ],
                     ),
@@ -239,6 +247,7 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> {
                   ? Icons.pause
                       : Icons.play_arrow,
                   ),
+                      color: Color(0xFF1ED760),
                   onPressed: () async {
                     final trackUri = trackItem["uri"] as String;
                     await playPause(trackUri);

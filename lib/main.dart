@@ -58,7 +58,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(child: CircularProgressIndicator(color:Color(0xFF1ED760))),
       );
     }
 
@@ -108,8 +108,13 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFF121212),
       appBar: AppBar(
-        title: Text(widget.title),
+        backgroundColor: Color(0x000000F2),
+        title: Text(widget.title,
+          style: TextStyle(color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 30,),),
         automaticallyImplyLeading: false,
         centerTitle: true,
       ),
@@ -124,11 +129,11 @@ class _MyHomePageState extends State<MyHomePage> {
               else
                 Column(
                   children: [
-                    const Icon(Icons.music_note, size: 50),
+                    const Icon(Icons.music_note, size: 50, color: Color(0xFF1ED760)),
                     const SizedBox(height: 20),
                     Text(
                       'Connect to Spotify',
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      style: TextStyle(color: Color(0xFF1ED760)),
                     ),
                     const SizedBox(height: 20),
                     if (_error != null)
@@ -142,9 +147,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ElevatedButton.icon(
                       onPressed: _authenticateWithSpotify,
-                      icon: const Icon(Icons.music_note),
-                      label: const Text('Login with Spotify'),
+                      icon: const Icon(Icons.music_note,
+                      color: Colors.white),
+                      label: const Text('Login with Spotify', style: TextStyle(color: Colors.white),),
                       style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF1ED760),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 30, vertical: 15),
                       ),

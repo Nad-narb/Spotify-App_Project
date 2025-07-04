@@ -14,17 +14,17 @@ class BarChartSample1 extends StatefulWidget {
   final String title;
 
   List<Color> get availableColors => const <Color>[
-    Colors.purple,
-    Colors.yellow,
-    Colors.blue,
-    Colors.orange,
-    Colors.pink,
-    Colors.red,
+    Color(0xFFa8e6cf),
+    Color(0xFFdcedc1),
+    Color(0xFFffd3b6),
+    Color(0xFFc4f6ff),
+    Color(0xFFffaaa5),
+    Color(0xFFff8b94),
   ];
 
-  final Color barBackgroundColor = Colors.white;
-  final Color barColor = Colors.blue;
-  final Color touchedBarColor = Colors.green;
+  final Color barBackgroundColor = Color(0xFF303030);
+  final Color barColor = Colors.green;
+  final Color touchedBarColor = Color(0xFF1ED760);
 
 @override
 State<StatefulWidget> createState() => BarChartSample1State();
@@ -40,7 +40,6 @@ class BarChartSample1State extends State<BarChartSample1> {
 
   @override
   void initState() {
-    debugPrint("Reached genre page");
     _loadGenreData();
     super.initState();
   }
@@ -84,14 +83,20 @@ class BarChartSample1State extends State<BarChartSample1> {
   @override
   Widget build(BuildContext context) {
     if(isLoading){
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator(color:Color(0xFF1ED760)));
     }
     if(genreKeys.isEmpty){
       return const Center(child: Text("No genre data available"));
     }
-    return Scaffold(backgroundColor: Colors.grey,
+    return Scaffold(
+        backgroundColor: Color(0xFF121212),
       appBar: AppBar(
-        title: Text(widget.title),
+        backgroundColor: Color(0x000000F2),
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(widget.title,
+          style: TextStyle(color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 30,),),
           automaticallyImplyLeading: false,
           leading: Builder(
             builder: (context) {
@@ -105,6 +110,7 @@ class BarChartSample1State extends State<BarChartSample1> {
       ),
     ),
     drawer: Drawer(
+      backgroundColor: Color(0xFF181818),
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
@@ -113,13 +119,16 @@ class BarChartSample1State extends State<BarChartSample1> {
             child: Text('Drawer Header'),
           ),
           ListTile(
-            title: const Text('Top Tracks', style: TextStyle(color: Colors.black)),
+            title: const Text('Top Tracks', style: TextStyle(color: Colors.white, fontSize: 20)),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => TracksPage(title: "Tracks")),
+              );
             },
           ),
           ListTile(
-            title: const Text('Top Artists', style: TextStyle(color: Colors.black)),
+            title: const Text('Top Artists', style: TextStyle(color: Colors.white, fontSize: 20)),
             onTap: () {
               Navigator.push(
               context,
@@ -128,13 +137,13 @@ class BarChartSample1State extends State<BarChartSample1> {
             },
           ),
           ListTile(
-            title: const Text('Top Genres', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+            title: const Text('Top Genres', style: TextStyle(color: Color(0xFF1ED760), fontWeight: FontWeight.bold, fontSize: 20)),
             onTap: () {
               Navigator.pop(context);
             },
           ),
           ListTile(
-            title: const Text('Recently Played', style: TextStyle(color: Colors.black)),
+            title: const Text('Recently Played', style: TextStyle(color: Colors.white, fontSize: 20)),
             onTap: () {
               Navigator.push(
                 context,
@@ -143,7 +152,7 @@ class BarChartSample1State extends State<BarChartSample1> {
             },
           ),
           ListTile(
-            title: const Text('Logout' , style: TextStyle(color: Colors.black)),
+            title: const Text('Logout' , style: TextStyle(color: Colors.white, fontSize: 16)),
             onTap: () {
               logout;
               Navigator.push(
@@ -167,33 +176,17 @@ class BarChartSample1State extends State<BarChartSample1> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                /*
-                const SizedBox(
-                  height: 38,
-                ),
-                const Text(
-                  'Top Genres',
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(
-                  height: 4,
-                ),
                 Text(
                   'Past 6 Months',
                   style: TextStyle(
-                    color: Colors.green.shade700,
-                    fontSize: 18,
+                    color: Color(0xFF1ED760),
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(
                   height: 38,
                 ),
-                */
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -216,7 +209,7 @@ class BarChartSample1State extends State<BarChartSample1> {
               child: IconButton(
                 icon: Icon(
                   isPlaying ? Icons.pause : Icons.play_arrow,
-                  color: Colors.green,
+                  color: Color(0xFF1ED760),
                 ),
                 onPressed: () {
                   setState(() {
@@ -256,7 +249,7 @@ class BarChartSample1State extends State<BarChartSample1> {
           width: width,
           borderSide: isTouched
               ? BorderSide(color: widget.touchedBarColor)
-              : const BorderSide(color: Colors.white, width: 0),
+              : const BorderSide(color: Colors.black, width: 0),
           backDrawRodData: BackgroundBarChartRodData(
             show: true,
             toY: 20,
