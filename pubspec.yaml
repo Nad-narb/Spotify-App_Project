@@ -85,7 +85,7 @@ flutter:
   assets:
     - assets/cassette.gif
     - assets/cassette2.png
-    - lib/.env
+    - .env
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

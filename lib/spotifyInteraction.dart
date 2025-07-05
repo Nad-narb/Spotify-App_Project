@@ -24,6 +24,11 @@ class SpotifyOAuth2Client extends OAuth2Client {
   );
 }
 
+//ID and Secreet should be in their own .env file
+//Ran into problems and couldnt get that to work
+//Will try again later
+const String CLIENT_ID = 'f211c4add0944080bda55bd11f40dd17';
+const String CLIENT_SECRET = 'd520773dd34343a2b2b795913796c5a8';
 // Secure storage for persisting tokens
 final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
@@ -37,9 +42,9 @@ Random random = new Random();
     /// 3. Stores tokens securely
     /// Returns [AccessTokenResponse] on success, null on failure
     static Future<AccessTokenResponse?> authenticate() async {
-      await dotenv.load(fileName: ".env");
-      final CLIENT_ID = dotenv.env['CLIENT_ID'].toString();
-      final CLIENT_SECRET = dotenv.env['CLIENT_SECRET'].toString();
+      //await dotenv.load(fileName: ".env");
+      //final CLIENT_ID = dotenv.env['CLIENT_ID'].toString();
+      //final CLIENT_SECRET = dotenv.env['CLIENT_SECRET'].toString();
       try {
         // Initialize the custom OAuth2 client with our app's redirect URI
         final client = SpotifyOAuth2Client(
@@ -87,9 +92,9 @@ Random random = new Random();
 
   //Method for getting a new access token
   static Future<AccessTokenResponse?> refreshAccessToken() async {
-    await dotenv.load(fileName: ".env");
-    final CLIENT_ID = dotenv.env['CLIENT_ID'].toString();
-    final CLIENT_SECRET = dotenv.env['CLIENT_SECRET'].toString();
+    //await dotenv.load(fileName: ".env");
+    //final CLIENT_ID = dotenv.env['CLIENT_ID'].toString();
+    //final CLIENT_SECRET = dotenv.env['CLIENT_SECRET'].toString();
     try {
       final refreshToken = await _storage.read(key: 'refresh_token'); // get refresh token from storage
       if (refreshToken == null) {
