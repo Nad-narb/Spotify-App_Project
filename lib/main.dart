@@ -4,13 +4,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'tracks.dart';
 import './spotifyInteraction.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+
   const MyApp({super.key});
 
   @override
