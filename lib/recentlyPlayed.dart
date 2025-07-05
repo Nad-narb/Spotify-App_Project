@@ -75,7 +75,10 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> with TickerProv
   }
 
 
-
+  /*
+  When getting recently played tracks spotify returns information of when the track was last played
+  in the form of a string. This method formats the given string so it can be displayed nicely for the viewer
+   */
   String _formatTimeAgo(String playedAt) {
     try {
       final dateTime = DateTime.parse(playedAt).toLocal();

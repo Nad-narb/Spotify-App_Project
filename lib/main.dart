@@ -46,6 +46,11 @@ class _AuthWrapperState extends State<AuthWrapper> {
     _checkLoginStatus();
   }
 
+  /*
+  This method calls the isLoggedIn() method which returns a boolean
+  If the user is logged in the method will return true and the value will be assigned to _isLoggedIn
+  _isLoading stays false
+   */
   Future<void> _checkLoginStatus() async {
     final loggedIn = await SpotifyService.isLoggedIn();
     setState(() {
@@ -54,6 +59,12 @@ class _AuthWrapperState extends State<AuthWrapper> {
     });
   }
 
+  /*
+  If _isLoading is false then the application will show a progress/loading bar.
+  Otherwise it will check if the user is logged in or not. If the user is logged in
+  then the application will show the TracksPage. If the user is not logged in
+  then the user will have to authenticate with spotify
+   */
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -81,17 +92,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _authenticateWithSpotify() async {
     setState(() {
-      _isLoading = true;
-      _error = null;
+      _isLoading = true; // _isLoading set to true because application is waiting for authentication
+      _error = null; //error set to null because there is no error yet
     });
     try {
-      final token = await SpotifyService.authenticate();
-      if (token != null) {
+      /*
+
+       */
+      final token = await SpotifyService.authenticate(); //call SpotifyService.authenticate() to get access token
+      if (token != null) { // If user is authenticated then open the tracks page
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => TracksPage(title: "Tracks")),
         );
-      } else {
+      } else { // if authentication did not work throw an error
         setState(() {
           _error = 'Authentication failed. Please try again.';
           _isLoading = false;
@@ -146,7 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                     ElevatedButton.icon(
-                      onPressed: _authenticateWithSpotify,
+                      onPressed: _authenticateWithSpotify, // when user presses button it calls the _authenticateWithSpotify method
                       icon: const Icon(Icons.music_note,
                       color: Colors.white),
                       label: const Text('Login with Spotify', style: TextStyle(color: Colors.white),),

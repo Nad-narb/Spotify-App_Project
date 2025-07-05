@@ -8,66 +8,87 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+// Custom OAuth2 client for Spotify's authentication flow
 class SpotifyOAuth2Client extends OAuth2Client {
   SpotifyOAuth2Client({
     required String redirectUri,
     required String customUriScheme,
   }) : super(
+    // Spotify's OAuth2 authorization endpoint
     authorizeUrl: 'https://accounts.spotify.com/authorize',
+    // Spotify's token exchange endpoint
     tokenUrl: 'https://accounts.spotify.com/api/token',
     redirectUri: redirectUri,
     customUriScheme: customUriScheme,
   );
 }
 
+// Spotify API credentials
 const String CLIENT_ID = 'f211c4add0944080bda55bd11f40dd17';
 const String CLIENT_SECRET = 'd520773dd34343a2b2b795913796c5a8';
+
+// Secure storage for persisting tokens
 final FlutterSecureStorage _storage = const FlutterSecureStorage();
+
+// Random number generator (though not currently used in this snippet)
 Random random = new Random();
 
-class SpotifyService {
+  class SpotifyService {
+    /// Handles the complete Spotify OAuth2 authentication flow:
+    /// 1. Requests user authorization
+    /// 2. Exchanges authorization code for tokens
+    /// 3. Stores tokens securely
+    /// Returns [AccessTokenResponse] on success, null on failure
+    static Future<AccessTokenResponse?> authenticate() async {
+      try {
+        // Initialize the custom OAuth2 client with our app's redirect URI
+        final client = SpotifyOAuth2Client(
+          // Custom URI scheme for deep linking back to the app
+          customUriScheme: 'my.music.app',
+          // The redirect URI that Spotify will call after authorization
+          redirectUri: 'my.music.app://callback',
+        );
 
-  static Future<AccessTokenResponse?> authenticate() async {
-    try {
-      final client = SpotifyOAuth2Client(
-        customUriScheme: 'my.music.app',
-        redirectUri: 'my.music.app://callback',
-      );
+        // Step 1: Request user authorization
+        final authResp = await client.requestAuthorization(
+          clientId: CLIENT_ID,
+          // Forces the approval dialog to show every time (good for testing)
+          customParams: {'show_dialog': 'true'},
+          // Required permissions/scopes for our application
+          scopes: [
+            'user-read-private',          // Read user's private info
+            'user-read-playback-state',   // Read playback state
+            'user-modify-playback-state',  // Control playback
+            'user-read-currently-playing', // Get current track
+            'user-read-email',             // Read user's email
+            'user-top-read',               // Read user's top tracks/artists
+            'user-read-recently-played',   // Read recently played tracks
+          ],
+        );
 
-      final authResp = await client.requestAuthorization(
-        clientId: CLIENT_ID,
-        customParams: {'show_dialog': 'true'},
-        scopes: [
-          'user-read-private',
-          'user-read-playback-state',
-          'user-modify-playback-state',
-          'user-read-currently-playing',
-          'user-read-email',
-          'user-top-read',
-          'user-read-recently-played',
-        ],
-      );
+        // Step 2: Exchange authorization code for access/refresh tokens
+        final token = await client.requestAccessToken(
+          code: authResp.code!,            // The authorization code from step 1
+          clientId: CLIENT_ID,
+          clientSecret: CLIENT_SECRET,
+        );
 
-      final token = await client.requestAccessToken(
-        code: authResp.code!,
-        clientId: CLIENT_ID,
-        clientSecret: CLIENT_SECRET,
-      );
+        // Step 3: Securely store the tokens for future use
+        await _storage.write(key: 'access_token', value: token.accessToken);
+        await _storage.write(key: 'refresh_token', value: token.refreshToken);
 
-      // Save tokens securely
-      await _storage.write(key: 'access_token', value: token.accessToken);
-      await _storage.write(key: 'refresh_token', value: token.refreshToken);
-
-      return token;
-    } catch (e) {
-      debugPrint('Authentication error: $e');
-      return null;
+        return token;
+      } catch (e) {
+        // Log any errors during the authentication process
+        debugPrint('Authentication error: $e');
+        return null;
+      }
     }
-  }
 
+  //Method for getting a new access token
   static Future<AccessTokenResponse?> refreshAccessToken() async {
     try {
-      final refreshToken = await _storage.read(key: 'refresh_token');
+      final refreshToken = await _storage.read(key: 'refresh_token'); // get refresh token from storage
       if (refreshToken == null) {
         debugPrint('No refresh token available');
         return null;
@@ -78,6 +99,7 @@ class SpotifyService {
         redirectUri: 'my.music.app://callback',
       );
 
+      //Use the refresh token to get the new access token
       final token = await client.refreshToken(
         refreshToken,
         clientId: CLIENT_ID,
@@ -99,13 +121,18 @@ class SpotifyService {
     }
   }
 
+  //If access token is already stored that means user has logged in already
+  //and will not be required to authenticate again
   static Future<bool> isLoggedIn() async {
     final accessToken = await _storage.read(key: 'access_token');
     return accessToken != null;
   }
 
+
   static Future<String?> getValidAccessToken() async {
-    final ACCESS_TOKEN = await _storage.read(key: 'access_token');
+    final ACCESS_TOKEN = await _storage.read(key: 'access_token'); //get access token from storage
+
+    //make a random api call
     var accessCode = await http.get(
       Uri.parse('https://api.spotify.com/v1/artists/213zHiFZwtDVEqyxeCbk07'),
       headers: {
@@ -113,19 +140,20 @@ class SpotifyService {
         "authorization": 'Bearer $ACCESS_TOKEN',
       },
     );
+    //if spotify returns an error 401 that means access token is no longer valid
     if(accessCode.statusCode == 401)
       {
-        final refreshed = await refreshAccessToken();
+        final refreshed = await refreshAccessToken(); //get new access token
         if (refreshed != null) {
-          return refreshed.accessToken;
+          return refreshed.accessToken; //return new access token
         }
-        return null;
+        return null;//if refresh failed return null
     }
-    return ACCESS_TOKEN;
+    return ACCESS_TOKEN;//if access token is valid return the current access token
   }
 
   static Future<void> logout() async {
-    await _storage.deleteAll();
+    await _storage.deleteAll(); //deletes all information in storage if user logs out
   }
 }
 
@@ -144,45 +172,17 @@ Future<void> login() async {
   }
 }
 
-/*
-Future<void> makeSpotifyApiCall() async {
-  final ACCESS_TOKEN = await SpotifyService.getValidAccessToken();
-  if (ACCESS_TOKEN == null) {
-    // Not logged in or token refresh failed
-    await login(); // Show login screen
-    return;
-  }
-
-  try {
-    // Make your API call with the accessToken
-    final response = await http.get(
-      Uri.parse('https://api.spotify.com/v1/me'),
-      headers: {'Authorization': 'Bearer $ACCESS_TOKEN'},
-    );
-
-    if (response.statusCode == 401) {
-      // Token might be invalid, try to refresh
-      final newToken = await SpotifyService.refreshAccessToken();
-      if (newToken != null) {
-        // Retry the request with new token
-        return makeSpotifyApiCall();
-      } else {
-        // Force login
-        await login();
-      }
-    }
-    // Process successful response
-  } catch (e) {
-    debugPrint('API call error: $e');
-  }
-}
-*/
-
 Future<void> logout() async {
   await SpotifyService.logout();
   // Update UI to show logged out state
 }
 
+/*
+All of the getTopTracks methods basically do the same thing
+1. get access token from storage
+2. make a call to the api with their respective endpoints
+3. If the access code is 200 (success), decode the json file and return a list of the songs
+ */
 Future<List<dynamic>> getTopTracksShort() async {
   final ACCESS_TOKEN = await SpotifyService.getValidAccessToken();
   var featuredData = await http.get(
@@ -292,7 +292,9 @@ Future<List<dynamic>> getTopArtistsLong() async {
 }
 
 Future<List<dynamic>> getRecentlyPlayed() async {
-  final ACCESS_TOKEN = await SpotifyService.getValidAccessToken();
+  final ACCESS_TOKEN = await SpotifyService.getValidAccessToken(); //get access token from storage
+
+  //call the api with the endpoint for recently played tracks
   var featuredData = await http.get(
     Uri.parse('https://api.spotify.com/v1/me/player/recently-played?limit=50'),
     headers: {
@@ -302,9 +304,9 @@ Future<List<dynamic>> getRecentlyPlayed() async {
   );
   if (featuredData.statusCode == 200) {
     final featuredPlaylist = convert.jsonDecode(featuredData.body);
-    final items = featuredPlaylist['items'] as List<dynamic>;
+    final items = featuredPlaylist['items'] as List<dynamic>; //items gets the list of recently played songs
 
-    // Filter out consecutive duplicates
+    //Filters out if a song has been played consecutively, will only show the most recently played song
     final uniqueItems = <dynamic>[];
     String? lastTrackId;
 
@@ -348,7 +350,7 @@ Future<Map<String, List<String>>> getTopGenres() async {
   }
   var sortedEntries = genreCount.entries.toList()
     ..sort((a, b) => b.value.compareTo(a.value));
-  // Create the sorted map
+  // Create the sorted map with genres as keys and artists as values
   final Map<String, List<String>> sortedGenreArtists = {};
   for (var entry in sortedEntries) {
     final genre = entry.key;
@@ -366,7 +368,7 @@ Future<String> getDeviceId() async {
 
   // Try to get device list
   final response = await http.get(
-    Uri.parse('https://api.spotify.com/v1/me/player/devices'), // Fixed typo in endpoint
+    Uri.parse('https://api.spotify.com/v1/me/player/devices'),
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $accessToken',
@@ -375,7 +377,7 @@ Future<String> getDeviceId() async {
 
   if (response.statusCode == 200) {
     final data = convert.jsonDecode(response.body);
-    final devices = data['devices'] as List<dynamic>; // Fixed typo in property name
+    final devices = data['devices'] as List<dynamic>;
 
     if (devices.isEmpty) {
       throw Exception('No active devices found. Please open Spotify on your device.');

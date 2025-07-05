@@ -32,8 +32,8 @@ State<StatefulWidget> createState() => BarChartSample1State();
 }
 class BarChartSample1State extends State<BarChartSample1> with TickerProviderStateMixin {
   late final GifController controller1;
-  Map<String, List<String>> genreMap = {};
-  List<String> genreKeys = [];
+  Map<String, List<String>> genreMap = {}; //Will hold the genre along with the artists associated with the genres
+  List<String> genreKeys = []; //List that will hold the top genres
   final Duration animDuration = const Duration(milliseconds: 250);
   bool isLoading = true;
   int touchedIndex = -1;
@@ -49,10 +49,11 @@ class BarChartSample1State extends State<BarChartSample1> with TickerProviderSta
 
   Future<void> _loadGenreData() async {
     try {
-      final loadedGenreMap = await getTopGenres();
+      final loadedGenreMap = await getTopGenres(); //getTopGenres will return a Map with genres as keys and artists as values
       setState(() {
         genreMap = loadedGenreMap;
-        genreKeys = loadedGenreMap.keys.toList();
+        genreKeys = loadedGenreMap.keys.toList(); //genreKeys will just get the list of genres
+                                                  // (so I can access them via indexes without knowing the genres)
         isLoading = false;
       });
     }
@@ -64,6 +65,10 @@ class BarChartSample1State extends State<BarChartSample1> with TickerProviderSta
     }
   }
 
+  /*
+  When the user clicks in the bar it will display some of their top artists
+  This method just selects which artists to display
+   */
   String getArtists(List<String> artists) {
     int len = artists.length;
     String str;
@@ -172,6 +177,12 @@ class BarChartSample1State extends State<BarChartSample1> with TickerProviderSta
         ],
       ),
     ),
+      /*
+      This part of the code was copied from the fl_chart source code. They had premade
+      bar charts which I wanted to use and I just changed some parts of the code
+      to make it work with the data I wanted to display
+      Im will add comments to the code which I modified
+       */
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -270,6 +281,7 @@ class BarChartSample1State extends State<BarChartSample1> with TickerProviderSta
   }
 
   List<BarChartGroupData> showingGroups() => List.generate(5, (i) {
+    //The size of each bar group will be determined by the number of artist in each genre
     switch (i) {
       case 0:
         var l1 = (genreMap[genreKeys[0]]!.length).toDouble()*.5;
@@ -302,7 +314,7 @@ class BarChartSample1State extends State<BarChartSample1> with TickerProviderSta
             String genre;
             switch (group.x) {
               case 0:
-                genre = getArtists(genreMap[genreKeys[0]] as List<String>);
+                genre = getArtists(genreMap[genreKeys[0]] as List<String>); //Gets the top artists from each genre
                 break;
               case 1:
                 genre = getArtists(genreMap[genreKeys[1]] as List<String>);
@@ -319,7 +331,7 @@ class BarChartSample1State extends State<BarChartSample1> with TickerProviderSta
                 throw Error();
             }
             return BarTooltipItem(
-              'Top Artists:\n$genre\n',
+              'Top Artists:\n$genre\n', //displays the artists when user clicks on the bar
               const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -391,7 +403,7 @@ class BarChartSample1State extends State<BarChartSample1> with TickerProviderSta
     Widget text;
     switch (value.toInt()) {
       case 0:
-        text = Text(genreKeys[0].replaceAll(' ', '\n'), style: style);
+        text = Text(genreKeys[0].replaceAll(' ', '\n'), style: style); //Displays the genre names under each bar group
         break;
       case 1:
         text = Text(genreKeys[1].replaceAll(' ', '\n'), style: style);
