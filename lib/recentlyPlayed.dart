@@ -159,7 +159,7 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> with TickerProv
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => TracksPage(title: "Tracks")),
+                  MaterialPageRoute(builder: (context) => TracksPage(title: "Top Tracks")),
                 );
               },
             ),
@@ -168,7 +168,7 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> with TickerProv
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ArtistsPage(title: "Artists")),
+                  MaterialPageRoute(builder: (context) => ArtistsPage(title: "Top Artists")),
                 );
               },
             ),
@@ -177,7 +177,7 @@ class _RecentlyPlayedPageState extends State<RecentlyPlayedPage> with TickerProv
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => BarChartSample1(title: "Genres")),
+                  MaterialPageRoute(builder: (context) => BarChartSample1(title: "Top Genres")),
                 );
               },
             ),

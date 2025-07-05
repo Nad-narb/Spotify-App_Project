@@ -136,7 +136,7 @@ class BarChartSample1State extends State<BarChartSample1> with TickerProviderSta
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => TracksPage(title: "Tracks")),
+                MaterialPageRoute(builder: (context) => TracksPage(title: "Top Tracks")),
               );
             },
           ),
@@ -145,7 +145,7 @@ class BarChartSample1State extends State<BarChartSample1> with TickerProviderSta
             onTap: () {
               Navigator.push(
               context,
-                MaterialPageRoute(builder: (context) => ArtistsPage(title: "Artists")),
+                MaterialPageRoute(builder: (context) => ArtistsPage(title: "Top Artists")),
               );
             },
           ),

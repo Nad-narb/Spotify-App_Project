@@ -72,7 +72,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
       );
     }
 
-    return _isLoggedIn ? TracksPage(title: "Tracks") : const MyHomePage(title: 'Spotilytics');
+    return _isLoggedIn ? TracksPage(title: "Top Tracks") : const MyHomePage(title: 'Spotilytics');
   }
 }
 

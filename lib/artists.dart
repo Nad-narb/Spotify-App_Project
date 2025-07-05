@@ -115,7 +115,7 @@ class _ArtistsPageState extends State<ArtistsPage> with TickerProviderStateMixin
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => TracksPage(title: "Tracks")),
+                  MaterialPageRoute(builder: (context) => TracksPage(title: "Top Tracks")),
                 );
               },
             ),
@@ -130,7 +130,7 @@ class _ArtistsPageState extends State<ArtistsPage> with TickerProviderStateMixin
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => BarChartSample1(title: "Genres")),
+                  MaterialPageRoute(builder: (context) => BarChartSample1(title: "Top Genres")),
                 );
               },
             ),

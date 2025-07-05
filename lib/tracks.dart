@@ -168,7 +168,7 @@ class _TracksPageState extends State<TracksPage> with TickerProviderStateMixin{
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ArtistsPage(title: "Artists")), //moves the user to the top artists page
+                  MaterialPageRoute(builder: (context) => ArtistsPage(title: "Top Artists")), //moves the user to the top artists page
                 );
               },
             ),
@@ -177,7 +177,7 @@ class _TracksPageState extends State<TracksPage> with TickerProviderStateMixin{
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => BarChartSample1(title: "Genres")), //move user to top genre page
+                  MaterialPageRoute(builder: (context) => BarChartSample1(title: "Top Genres")), //move user to top genre page
                 );
               },
             ),
